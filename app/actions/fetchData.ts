@@ -10,8 +10,8 @@ export const fetchIsletmeler = async () => {
       console.error(error);
       return [];
     }
-
-    const response = await IsletmeModel.find({}).sort({ date: -1 }).lean();
+    const response = await IsletmeModel.find({});
+    console.log(response)
     const allIsletmes: Isletme[] = JSON.parse(JSON.stringify(response));
     return allIsletmes;
   } catch (error) {

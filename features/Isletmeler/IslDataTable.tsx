@@ -1,19 +1,28 @@
 import DataTableFrame from "../../components/Tables/DataTableFrame";
 import DeleteIcon from "@mui/icons-material/Delete";
-import InfoBox from "@/components/Ui/InfoBox";
 import OnayBox from "@/components/Ui/Onaybox";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
+import { toast } from "react-toastify";
 import { IconButton } from "@mui/material";
 import { stringColumn, actionColumn } from "@/components/Tables/columns";
+import { deleteIsletme } from "@/app/actions/deleteData";
 
 const IslDataTable = ({ isletmeler }: any) => {
-  const [openSnack, setOpenSnack] = useState(false);
   const [onayBoxInf, setOnayBoxInf] = useState({
     isOpen: false,
     content: "",
     onClickHandler: "",
     functionData: {},
   });
+
+  const isletmeDeleteHandler = async ({ isletmeId }) => {
+    const response = await deleteIsletme(isletmeId)
+    toast.success(response.msg);
+    setOnayBoxInf((prevFormData) => ({
+      ...prevFormData,
+      isOpen: false,
+    }));
+  };
 
   const columns = [
     stringColumn("unvan", "Unvan", 500),
@@ -25,15 +34,20 @@ const IslDataTable = ({ isletmeler }: any) => {
     stringColumn("notlar", "Notlar", 200),
     actionColumn({
       align: "center",
-      renderCell: (params, index) => {
+      renderCell: (params:any, index:any) => {
         const isletmeId = params.row.id;
         if (params.row.numberOfProje) {
           return null;
         }
         return (
-          <IconButton key={index} size="small" color="error">
-            <DeleteIcon />
-          </IconButton>
+          <IconButton
+          key={index}
+          size="small"
+          color="error"
+          onClick={() => isletmeDeleteHandler(isletmeId)}
+        >
+          <DeleteIcon />
+        </IconButton>
         );
       },
     }),

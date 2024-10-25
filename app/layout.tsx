@@ -4,7 +4,9 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { Roboto } from "next/font/google";
 import { ThemeProvider } from "@mui/material/styles";
 import { GlobalTheme } from "@/lib/styles/GlobalTheme";
+import { ToastContainer } from "react-toastify";
 import type { Metadata } from "next";
+import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 
 const roboto = Roboto({
@@ -32,6 +34,13 @@ export default function RootLayout({
             <CssBaseline />
             <div className="flex flex-col items-center justify-between w-full h-screen">
               <Header />
+              <ToastContainer
+              closeOnClick
+              autoClose={1500}
+              position="top-right"
+              theme="light"
+              pauseOnHover
+            />
               {children}
             </div>
           </ThemeProvider>

@@ -11,7 +11,7 @@ export const deleteIsletme = async (_id: string) => {
       return [];
     }
     await IsletmeModel.findByIdAndDelete(_id);
-    revalidatePath(`/`);
+    revalidatePath(`/isletmeler`);
     return { msg: "İşletme Silindi" };
   } catch (error) {
     return { msg: `İşletme Silinemedi: ${error}` };
