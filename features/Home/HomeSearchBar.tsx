@@ -1,5 +1,4 @@
 import SearchIcon from "@mui/icons-material/Search";
-import InfoBox from "../../components/Ui/InfoBox";
 import Grid from "@mui/material/Grid2";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ModalButton from "@/components/modals/ModalButton";
@@ -50,7 +49,6 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
   isletme,
 }) => {
   const [openAddIsletmeModal, setOpenAddIsletmeModal] = useState(false);
-  const [openSnack, setOpenSnack] = useState(false);
   const [onayBoxInf, setOnayBoxInf] = useState<OnayBoxInfo>({
     isOpen: false,
     content: "",

@@ -4,23 +4,28 @@ import SendIcon from "@mui/icons-material/Send";
 import FormSelect from "./ui/FormSelect";
 import { Form, Formik, Field } from "formik";
 import { Stack, MenuItem, Button } from "@mui/material";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
+import { Sektor } from "@/lib/types/types";
+import { fetchSectors } from "@/app/actions/fetchData";
+
+interface InitialData {
+  _id: string;
+  unvan?: string;
+  sistemId?: string;
+  vergiNo?: string;
+  naceKodu?: string;
+  adres?: string;
+  mail?: string;
+  yetkili?: string;
+  tel1?: string;
+  tel2?: string;
+  notlar?: string;
+  uets?: string;
+}
 
 interface IsletmeFormProps {
-  initialData: {
-    unvan: string;
-    sistemId: string;
-    vergiNo: string;
-    naceKodu: string;
-    adres: string;
-    mail: string;
-    yetkili?: string;
-    tel1?: string;
-    tel2?: string;
-    notlar?: string;
-    uets?: string;
-  };
-  submitHandler: (values: any) => void;
+  initialData: InitialData;
+  submitHandler: (values: InitialData) => void;
   buttonName?: string;
 }
 
@@ -29,26 +34,28 @@ const IsletmeForm: React.FC<IsletmeFormProps> = ({
   submitHandler,
   buttonName = "EKLE",
 }) => {
-  const { response, loading, axiosFetch } = useAxios();
+  const [sektorler, setSektorler] = useState<Sektor[]>([]);
 
-  const fetchSektorData = useCallback(() => {
-    axiosFetch({
-      method: "GET",
-      url: "/sektordata",
-    });
-  }, [axiosFetch]);
+  const fetchSektorData = useCallback(async () => {
+    try {
+      const response = await fetchSectors();
+      setSektorler(response);
+    } catch (error) {
+      console.error("Sektör verileri yüklenirken hata oluştu:", error);
+    }
+  }, []);
 
   useEffect(() => {
     fetchSektorData();
   }, [fetchSektorData]);
 
   const validateSchema = Yup.object().shape({
-    unvan: Yup.string().required("Gerekli").min(2, "En az 5 Karakter"),
+    unvan: Yup.string().required("Gerekli").min(2, "En az 2 karakter"),
     sistemId: Yup.string().required("Boş Olamaz"),
-    vergiNo: Yup.string().required("Boş Olamaz").min(10, "En az 10 Karakter"),
+    vergiNo: Yup.string().required("Boş Olamaz").min(10, "En az 10 karakter"),
     naceKodu: Yup.string().required("Boş Olamaz"),
     adres: Yup.string().required("Boş Olamaz"),
-    mail: Yup.string().required("Boş Olamaz"),
+    mail: Yup.string().email("Geçersiz e-posta").required("Boş Olamaz"),
   });
 
   return (
@@ -81,15 +88,13 @@ const IsletmeForm: React.FC<IsletmeFormProps> = ({
                 size="small"
               />
             </Stack>
-            {!loading && (
-              <Field name="naceKodu" component={FormSelect} label="Sektör">
-                {response?.map(({ isim }: { isim: string }, index: number) => (
-                  <MenuItem value={isim} key={index}>
-                    {isim}
-                  </MenuItem>
-                ))}
-              </Field>
-            )}
+            <Field name="naceKodu" component={FormSelect} label="Sektör">
+              {sektorler?.map(({ isim }, index) => (
+                <MenuItem value={isim} key={index}>
+                  {isim}
+                </MenuItem>
+              ))}
+            </Field>
             <Stack direction={"row"} spacing={1}>
               <FormTextField
                 sx={{ width: "100%" }}

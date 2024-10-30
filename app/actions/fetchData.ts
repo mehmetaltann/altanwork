@@ -1,53 +1,39 @@
 "use server";
 import dbConnect from "@/lib/db/dbConnect";
 import IsletmeModel from "@/lib/models/IsletmeModel";
-import { Parameter } from "@/lib/types/types";
+import { Parameter, Isletme } from "@/lib/types/types";
 import {
   DestekModel,
   ProgramModel,
   SectorModel,
 } from "@/lib/models/ParametersModel";
 
-export const fetchIsletme = async (queryType: string, queryText: string) => {
+export const fetchIsletme = async (queryText: string, queryType: string) => {
   try {
     await dbConnect();
     let isletme;
     if (queryType === "unvan") {
       const pattern = new RegExp(`^${queryText}`, "i");
-      const isletmeler = await IsletmeModel.find(
-        { unvan: pattern },
-        { _id: 0 }
-      );
+      const isletmeler = await IsletmeModel.find({ unvan: pattern });
       if (isletmeler.length === 0) {
         return { msg: "Böyle bir işletme bulunmuyor", status: false };
       }
-      isletme = isletmeler[0];
-    } else if (queryType === "vergino") {
-      isletme = await IsletmeModel.findOne({ vergiNo: queryText }, { _id: 0 });
-      if (!isletme) {
+      const filteredIsletmeler = JSON.parse(JSON.stringify(isletmeler));
+      isletme = filteredIsletmeler[0];
+    } else if (queryType === "vergiNo") {
+      const res = await IsletmeModel.findOne({ vergiNo: queryText });
+      if (!res) {
         return { msg: "Böyle bir işletme bulunmuyor", status: false };
       }
+      isletme = JSON.parse(JSON.stringify(res));
     } else if (queryType === "id") {
-      isletme = await IsletmeModel.findOne({ id: queryText }, { _id: 0 });
-      if (!isletme) {
+      const res = await IsletmeModel.findOne({ sistemId: queryText });
+      if (!res) {
         return { msg: "Böyle bir işletme bulunmuyor", status: false };
       }
+      isletme = JSON.parse(JSON.stringify(res));
     } else {
       return { msg: "Geçersiz sorgu türü.", status: false };
-    }
-    if (isletme && isletme.projeler) {
-      for (const proje of isletme.projeler) {
-        if (proje._id) {
-          proje._id = proje._id.toString();
-        }
-        if (proje.odemeler) {
-          for (const odeme of proje.odemeler) {
-            if (odeme._id) {
-              odeme._id = odeme._id.toString();
-            }
-          }
-        }
-      }
     }
     return { msg: "İşletme bulundu.", status: true, data: isletme };
   } catch (error) {
@@ -205,8 +191,9 @@ export const fetchIsletmeler = async (): Promise<any[]> => {
 const fetchFromModel = async (model: any): Promise<Parameter[]> => {
   try {
     await dbConnect();
-    const allItems = await model.find({}, { _id: 0 }).lean();
-    return allItems as Parameter[];
+    const allItems = await model.find({}).lean();
+    const filteredAllItems: Parameter[] = JSON.parse(JSON.stringify(allItems));
+    return filteredAllItems as Parameter[];
   } catch (error) {
     console.error(`Error fetching from model ${model.modelName}:`, error);
     return [];

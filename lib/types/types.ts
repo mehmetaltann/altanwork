@@ -42,6 +42,12 @@ export type Isletme = {
 };
 
 export type Parameter = {
+  _id: string;
   id: string;
+  isim: string;
+};
+
+export type Sektor = {
+  _id: string;
   isim: string;
 };

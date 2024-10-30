@@ -1,12 +1,21 @@
 "use client";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
 import { addUser } from "@/app/actions/insertData";
+import {
+  Avatar,
+  Button,
+  Typography,
+  TextField,
+  Box,
+  Container,
+} from "@mui/material";
 
 const RegisterForm: React.FC = () => {
-  const [formState, formAction] = useFormState(addUser, null);
+  const [formState, formAction] = useActionState(addUser, null);
 
   useEffect(() => {
     if (Array.isArray(formState)) return;
@@ -22,56 +31,77 @@ const RegisterForm: React.FC = () => {
     "p-2.5 border-b-[gray] border-[none] border-b border-solid";
 
   return (
-    <div
-      className="flex flex-col m-16 md:mt-10 max-w-[410px] items-center justify-center bg-[#f9f9f9]"
-    >
-      <h1 className="text-xl text-[teal] mb-2 px-4 py-6 rounded-lg">
-        Kayıt Formu
-      </h1>
-      <form
-        id="registerForm"
-        action={formAction}
-        className="flex flex-col w-full gap-3 bg-[#f9f9f9]"
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 15,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
-        <input
-          required
-          type="text"
-          placeholder="İsim ..."
-          name="isim"
-          className={inputClassName}
-        />
-        <input
-          required
-          type="email"
-          placeholder="Email ..."
-          name="email"
-          className={inputClassName}
-        />
-        <input
-          required
-          type="password"
-          placeholder="Şifre ..."
-          name="password"
-          className={inputClassName}
-        />
-        <button
-          type="submit"
-          className="bg-[teal] cursor-pointer text-[white] p-2.5 border-[none]"
+        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+          <HowToRegIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          Kullanıcı Kayıt
+        </Typography>
+        <Box
+          component="form"
+          id="registerForm"
+          action={formAction}
+          noValidate
+          sx={{ mt: 1 }}
         >
-          Kayıt Ol
-        </button>
-
-        <p className="text-xs text-center">
-          Mevcut Hesabınız Var mı ?
-          <Link
-            href="/auth"
-            className="font-medium text-color1 hover:underline"
+          <TextField
+            margin="normal"
+            variant="outlined"
+            required
+            fullWidth
+            id="username"
+            label="Kullanıcı Adı"
+            name="isim"
+            autoFocus
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="E-Mail"
+            name="email"
+            autoFocus
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Şifre"
+            type="password"
+            id="password"
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
           >
-            Giriş
-          </Link>
-        </p>
-      </form>
-    </div>
+            Kayıt Ol
+          </Button>
+
+          <Typography>
+            Mevcut Hesabınız Varmı ?
+            <Link
+              href="/login"
+              style={{ textDecoration: "none", color: "black" }}
+            >
+              {" Giriş"}
+            </Link>
+          </Typography>
+        </Box>
+      </Box>
+    </Container>
   );
 };
 

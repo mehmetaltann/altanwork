@@ -1,5 +1,14 @@
-import Main from "@/features/Home/Main";
+import Header from "@/components/Layouts/Header";
+import HomeMain from "@/features/Home/HomeMain";
+import { PageWrapper } from "@/components/Layouts/Wrappers";
 
 export default function Home() {
-  return <Main />;
+  return (
+    <>
+      <Header />
+      <PageWrapper>
+        <HomeMain />
+      </PageWrapper>
+    </>
+  );
 }

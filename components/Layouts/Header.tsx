@@ -15,6 +15,8 @@ import {
   MenuItem,
   Avatar,
 } from "@mui/material";
+import { signOut } from "next-auth/react";
+import Link from "next/link";
 
 interface Page {
   title: string;
@@ -157,8 +159,7 @@ const NavBar: React.FC = () => {
                   color: "white",
                   display: "block",
                   fontSize: "1rem",
-                  fontWeight: "500"
-
+                  fontWeight: "500",
                 }}
               >
                 {title}
@@ -168,9 +169,7 @@ const NavBar: React.FC = () => {
 
           <Box sx={{ flexGrow: 0 }}>
             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-              <Avatar
-                alt="Mehmet Altan"
-              />
+              <Avatar alt="Mehmet Altan" />
             </IconButton>
 
             <Menu
@@ -190,14 +189,17 @@ const NavBar: React.FC = () => {
               onClose={handleCloseUserMenu}
             >
               <MenuItem onClick={() => router.push("/parametreler")}>
-                <Typography textAlign="center">Parametreler</Typography>
+                <Link
+                  href={"/register"}
+                  style={{ textDecoration: "none", color: "black" }}
+                >
+                  <Typography textAlign="center">Yeni Kullanıcı</Typography>
+                </Link>
               </MenuItem>
 
               <MenuItem
                 onClick={() => {
-                  localStorage.removeItem("token");
-                  router.push("/");
-                  window.location.reload();
+                  signOut({ callbackUrl: "/login", redirect: true });
                 }}
               >
                 <Typography textAlign="center">Çıkış Yap</Typography>

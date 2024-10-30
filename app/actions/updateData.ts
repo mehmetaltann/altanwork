@@ -11,17 +11,20 @@ interface UpdateResponse {
 }
 
 export const updateIsletme = async (
-  formData: Isletme
+  _id: string,
+  formData: any
 ): Promise<UpdateResponse> => {
-  const { _id } = formData;
   if (!mongoose.Types.ObjectId.isValid(_id)) {
     return { msg: "Geçersiz ID formatı", status: false };
   }
   try {
     await dbConnect();
-    const updatedIsletme = await IsletmeModel.findByIdAndUpdate(_id, formData, {
-      new: true,
-    });
+    const updatedIsletme = await IsletmeModel.updateOne(
+      { _id: _id },
+      {
+        $set: formData,
+      }
+    );
     if (!updatedIsletme) {
       return { msg: "İşletme bulunamadı", status: false };
     }

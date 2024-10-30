@@ -1,9 +1,15 @@
-import React from 'react'
+import Header from "@/components/Layouts/Header";
+import { PageWrapper } from "@/components/Layouts/Wrappers";
 
 const Projeler = () => {
   return (
-    <div>Projeler</div>
-  )
-}
+    <>
+      <Header />
+      <PageWrapper>
+        <div>Projeler</div>
+      </PageWrapper>
+    </>
+  );
+};
 
-export default Projeler
+export default Projeler;

@@ -109,10 +109,8 @@ const deleteItem = async (
   itemName: string
 ): Promise<DeleteResponse> => {
   try {
-    if (!mongoose.Types.ObjectId.isValid(_id)) {
-      return { msg: "Geçersiz ID formatı", status: false };
-    }
     await dbConnect();
+    console.log(_id);
     const result = await model.findByIdAndDelete(_id);
     if (!result) {
       return { msg: `${itemName} bulunamadı`, status: false };
@@ -131,10 +129,10 @@ const deleteItem = async (
 };
 
 // Specific delete functions for Program and Destek
-export const deleteProgram = (_id: string): Promise<DeleteResponse> => {
-  return deleteItem(ProgramModel, _id, "Program");
+export const deleteProgram = async (_id: string): Promise<DeleteResponse> => {
+  return await deleteItem(ProgramModel, _id, "Program");
 };
 
-export const deleteDestek = (_id: string): Promise<DeleteResponse> => {
-  return deleteItem(DestekModel, _id, "Destek");
+export const deleteDestek = async (_id: string): Promise<DeleteResponse> => {
+  return await deleteItem(DestekModel, _id, "Destek");
 };

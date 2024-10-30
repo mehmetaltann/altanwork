@@ -5,6 +5,7 @@ import IsletmeModel from "@/lib/models/IsletmeModel";
 import UserModel from "@/lib/models/UserModel";
 import { revalidatePath } from "next/cache";
 import { DestekModel, ProgramModel } from "@/lib/models/ParametersModel";
+import { Odeme } from "@/lib/types/types";
 
 interface InsertResponse {
   msg: string;
@@ -67,7 +68,6 @@ export const addProje = async (formData: any): Promise<InsertResponse> => {
 
 export const addOdeme = async (formData: any): Promise<InsertResponse> => {
   const { isletmeId, projeId } = formData;
-
   try {
     await dbConnect();
     const result = await IsletmeModel.updateOne(

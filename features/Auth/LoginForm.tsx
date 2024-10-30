@@ -1,8 +1,17 @@
 "use client";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import {
+  Avatar,
+  Button,
+  Typography,
+  TextField,
+  Box,
+  Container,
+} from "@mui/material";
 
 const LoginForm: React.FC = () => {
   const router = useRouter();
@@ -26,9 +35,7 @@ const LoginForm: React.FC = () => {
         return;
       }
 
-      event.currentTarget.reset();
-
-      router.replace("admin");
+      router.replace("/");
     } catch (error) {
       toast.error(
         "Bir hata oluştu: " +
@@ -40,38 +47,52 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-screen bg-color7">
-      <form
-        className="flex flex-col bg-white w-full md:w-2/3 lg:w-1/4 gap-5 p-[50px]"
-        onSubmit={submitLogin}
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 25,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
-        <input
-          required
-          type="email"
-          name="email"
-          id="email"
-          placeholder="Email ..."
-          className="p-2.5 border-b-[gray] border-none border-b border-solid"
-        />
-        <input
-          required
-          type="password"
-          name="password"
-          id="password"
-          placeholder="Şifre ..."
-          className="p-2.5 border-b-[gray] border-none border-b border-solid"
-        />
-        <button
-          type="submit"
-          className={`bg-red-700 cursor-pointer text-white p-2.5 border-none font-semibold ${
-            loading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          disabled={loading} // Disable the button while loading
-        >
-          {loading ? "Giriş Yapılıyor..." : "Giriş Yap"}
-        </button>
-      </form>
-    </div>
+        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          Kullanıcı Girişi
+        </Typography>
+        <Box component="form" onSubmit={submitLogin} noValidate sx={{ mt: 1 }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="username"
+            name="email"
+            autoComplete="username"
+            autoFocus
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            disabled={loading}
+          >
+            {loading ? "Giriş Yapılıyor..." : "Giriş Yap"}
+          </Button>
+        </Box>
+      </Box>
+    </Container>
   );
 };
 

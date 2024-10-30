@@ -32,17 +32,16 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <ThemeProvider theme={GlobalTheme}>
             <CssBaseline />
-            <div className="flex flex-col items-center justify-between w-full h-screen">
-              <Header />
+            <>
               <ToastContainer
-              closeOnClick
-              autoClose={1500}
-              position="top-right"
-              theme="light"
-              pauseOnHover
-            />
+                closeOnClick
+                autoClose={1500}
+                position="top-right"
+                theme="light"
+                pauseOnHover
+              />
               {children}
-            </div>
+            </>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>

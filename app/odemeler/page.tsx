@@ -1,4 +1,5 @@
 import OdmTableContainer from "@/features/Odemeler/OdmTableContainer";
+import Header from "@/components/Layouts/Header";
 import { Odeme } from "@/lib/types/types";
 import { fetchOdemeler } from "../actions/fetchData";
 import { Typography } from "@mui/material";
@@ -9,9 +10,12 @@ export default async function Odemeler() {
     const odemeler = (await fetchOdemeler("BEKLEMEDE")) as Odeme[];
 
     return (
-      <PageWrapper>
-        <OdmTableContainer odemeler={odemeler} />
-      </PageWrapper>
+      <>
+        <Header />
+        <PageWrapper>
+          <OdmTableContainer odemeler={odemeler} />
+        </PageWrapper>
+      </>
     );
   } catch (error) {
     console.error("Error fetching isletmeler:", error);
