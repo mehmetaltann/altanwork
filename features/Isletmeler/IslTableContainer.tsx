@@ -1,9 +1,14 @@
 "use client";
+import IslDataTable from "./IslDataTable";
 import { DataTableWrapper } from "@/components/Layouts/Wrappers";
 import { Typography, Paper, Stack } from "@mui/material";
-import IslDataTable from "./IslDataTable";
+import { Isletme } from "@/lib/types/types";
 
-const IslTableContainer = ({ isletmeler }: any) => {
+const IslTableContainer = ({ isletmeler }: { isletmeler: Isletme[] }) => {
+  if (!isletmeler || isletmeler.length === 0) {
+    return <Typography>No data available</Typography>;
+  }
+
   return (
     <Paper>
       <Stack
@@ -16,7 +21,7 @@ const IslTableContainer = ({ isletmeler }: any) => {
           İşletmeler
         </Typography>
       </Stack>
-      <DataTableWrapper sxProps={{ p: { xs: 1, md: 2 } }}>
+      <DataTableWrapper tableHeight={"78vh"} sx={{ p: { xs: 1, md: 2 } }}>
         <IslDataTable isletmeler={isletmeler} />
       </DataTableWrapper>
     </Paper>

@@ -11,10 +11,14 @@ interface OnayBoxProps {
   onayBoxInf: {
     isOpen: boolean;
     content: string;
-    onClickHandler: (data: any) => void;
-    functionData: any;
+    onClickHandler: (data: { isletmeId: string }) => Promise<void>;
+    functionData: {
+      isletmeId?: string;
+    };
   };
-  setOnayBoxInf: React.Dispatch<React.SetStateAction<OnayBoxProps["onayBoxInf"]>>;
+  setOnayBoxInf: React.Dispatch<
+    React.SetStateAction<OnayBoxProps["onayBoxInf"]>
+  >;
 }
 
 const OnayBox: React.FC<OnayBoxProps> = ({ onayBoxInf, setOnayBoxInf }) => {

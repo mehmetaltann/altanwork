@@ -1,21 +1,5 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
-import { Odeme, Proje } from "../types/types";
-
-interface Isletme extends Document {
-  unvan: string;
-  vergiNo: string;
-  yetkili: string;
-  adres: string;
-  mail: string;
-  id: string;
-  sistemId: string;
-  naceKodu: string;
-  notlar?: string;
-  tel1?: string;
-  tel2?: string;
-  uets?: string;
-  projeler: Proje[];
-}
+import mongoose, { Model, Schema } from "mongoose";
+import { Odeme, Proje, Isletme } from "../types/types";
 
 const OdemeSchema = new Schema<Odeme>({
   destek: {
@@ -68,11 +52,9 @@ const ProjeSchema = new Schema<Proje>({
   },
   izleyici: {
     type: String,
-    optional: true,
   },
   notlar: {
     type: String,
-    optional: true,
   },
   program: {
     type: String,
@@ -128,24 +110,20 @@ const IsletmeSchema = new Schema<Isletme>({
   },
   notlar: {
     type: String,
-    optional: true,
   },
   tel1: {
     type: String,
-    optional: true,
   },
   tel2: {
     type: String,
-    optional: true,
   },
   uets: {
     type: String,
-    optional: true,
   },
   projeler: [ProjeSchema],
 });
 
 const IsletmeModel: Model<Isletme> =
-  mongoose.models.isletme || mongoose.model<Isletme>("isletme", IsletmeSchema);
+  mongoose.models?.isletme || mongoose.model<Isletme>("isletme", IsletmeSchema);
 
 export default IsletmeModel;

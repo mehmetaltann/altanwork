@@ -1,4 +1,4 @@
-import { Box, Container } from "@mui/material";
+import { Box, Container, SxProps } from "@mui/material";
 
 interface PageWrapperProps {
   children: React.ReactNode;
@@ -24,23 +24,23 @@ export const PageWrapper: React.FC<PageWrapperProps> = ({
   );
 };
 
-interface DataTableWrapperProps {
+type DataTableWrapperProps = {
   children: React.ReactNode;
-  tableHeight: string | number;
-  sxProps?: React.CSSProperties;
-}
+  tableHeight?: string | number;
+  sx?: SxProps;
+};
 
 export const DataTableWrapper: React.FC<DataTableWrapperProps> = ({
   children,
   tableHeight,
-  sxProps,
+  sx,
 }) => {
   return (
     <Box
       sx={{
         height: tableHeight,
         width: "100%",
-        ...sxProps,
+        ...sx,
       }}
     >
       {children}
