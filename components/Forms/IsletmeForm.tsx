@@ -5,27 +5,12 @@ import FormSelect from "./ui/FormSelect";
 import { Form, Formik, Field } from "formik";
 import { Stack, MenuItem, Button } from "@mui/material";
 import { useEffect, useCallback, useState } from "react";
-import { Sektor } from "@/lib/types/types";
+import { Isletme, Sektor } from "@/lib/types/types";
 import { fetchSectors } from "@/app/actions/fetchData";
 
-interface InitialData {
-  _id: string;
-  unvan?: string;
-  sistemId?: string;
-  vergiNo?: string;
-  naceKodu?: string;
-  adres?: string;
-  mail?: string;
-  yetkili?: string;
-  tel1?: string;
-  tel2?: string;
-  notlar?: string;
-  uets?: string;
-}
-
 interface IsletmeFormProps {
-  initialData: InitialData;
-  submitHandler: (values: InitialData) => void;
+  initialData: Isletme;
+  submitHandler: (values: Isletme) => void;
   buttonName?: string;
 }
 

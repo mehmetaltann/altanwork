@@ -4,7 +4,7 @@ import { Fragment } from "react";
 
 interface ModalIconButtonProps {
   children: React.ReactNode;
-  title: string;
+  title: string | undefined;
   height?: { md: string; xs: string };
   color?: "inherit" | "primary" | "secondary" | "default";
   modalOpen: boolean;

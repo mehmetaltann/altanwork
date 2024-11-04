@@ -3,7 +3,7 @@ import moment from "moment";
 const DEFAULT_DATE_FORMAT = "DD.MM.YYYY";
 
 export const dateFormat = (
-  date: string,
+  date: string | undefined,
   format: string = DEFAULT_DATE_FORMAT
 ): string => {
   const momentDate = moment(date);

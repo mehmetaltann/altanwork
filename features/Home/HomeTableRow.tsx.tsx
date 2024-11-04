@@ -5,9 +5,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ProjeForm from "@/components/Forms/ProjeForm";
 import OdemeForm from "@/components/Forms/OdemeForm";
 import ModalIconButton from "@/components/modals/ModalIconButton";
+import OnayBox from "@/components/Ui/Onaybox";
 import { toast } from "react-toastify";
 import { getChangedValues, dateFormat } from "@/utils/helpers";
 import { Fragment, useState } from "react";
+import { updateOdeme, updateProje } from "@/app/actions/updateData";
+import { deleteOdeme, deleteProje } from "@/app/actions/deleteData";
+import { handleResponseMsg } from "@/utils/toast-helper";
+import { Isletme, Odeme, Proje } from "@/lib/types/types";
 import {
   Table,
   Typography,
@@ -19,16 +24,7 @@ import {
   Collapse,
   Divider,
   Modal,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
 } from "@mui/material";
-import { updateProje } from "@/app/actions/updateData";
-import { deleteOdeme, deleteProje } from "@/app/actions/deleteData";
-import { handleResponseMsg } from "@/utils/toast-helper";
 
 const modalStyle = {
   position: "absolute",
@@ -68,7 +64,7 @@ function Item({ name }: { name: string }) {
       </TableCell>
     );
   }
-  return null; // Farklı bir durum olmadığında null döndür
+  return null;
 }
 
 interface OnayBoxInf {
@@ -81,49 +77,42 @@ interface OnayBoxInf {
 }
 
 interface HomeTableRowProps {
-  data: {
-    id: string;
-    isletmeId: string;
-    baslamaTarihi: string;
-    tamamlanmaTarihi: string;
-    takipTarihi: string;
-    notlar: string;
-    sure: string;
-    program: string;
-    izleyici: string;
-    durum: string;
-    odemeler: Array<{
-      id: string;
-      karekod: string;
-      projeId: string;
-      tarih: string;
-      tutar: number;
-      destek: string;
-      durum: string;
-    }>;
-  };
-  index: number;
+  isletme: Isletme;
+  proje: Proje;
+  projeIndex: number | any;
   setSearchData: (data: any) => void;
 }
 
-const HomeTableRow = ({ data, index, setSearchData }: HomeTableRowProps) => {
+const HomeTableRow = ({
+  proje,
+  projeIndex,
+  setSearchData,
+  isletme,
+}: HomeTableRowProps) => {
   const {
     id,
     isletmeId,
     baslamaTarihi,
     tamamlanmaTarihi,
     takipTarihi,
-    notlar,
     sure,
     program,
-    izleyici,
     durum,
     odemeler,
-  } = data;
+  } = proje;
 
   const [openArrow, setOpenArrow] = useState<boolean>(false);
   const [openEditProjeModal, setOpenEditProjeModal] = useState<boolean>(false);
-  const [initalOdemeData, setInitalOdemeData] = useState<any>(null);
+  const [initalOdemeData, setInitalOdemeData] = useState<Odeme>({
+    _id: "",
+    destek: "",
+    durum: "",
+    id: "",
+    karekod: "",
+    projeId: "",
+    tarih: "",
+    tutar: 0,
+  });
   const [openEditOdemeModal, setOpenEditOdemeModal] = useState<boolean>(false);
 
   const [onayBoxInf, setOnayBoxInf] = useState<OnayBoxInf>({
@@ -134,49 +123,20 @@ const HomeTableRow = ({ data, index, setSearchData }: HomeTableRowProps) => {
   });
 
   const totalPayment = odemeler
-    .reduce((n, { tutar }) => n + tutar, 0)
-    .toFixed(2);
-
-  const projeInitialValues = {
-    baslamaTarihi,
-    tamamlanmaTarihi,
-    takipTarihi,
-    notlar,
-    sure,
-    program,
-    izleyici,
-    durum,
-  };
-
-  const handleDialogClose = () => {
-    setOnayBoxInf((prevFormData) => ({
-      ...prevFormData,
-      isOpen: false,
-    }));
-  };
-
-  const handleResponse = (res: any) => {
-    if (res.status) {
-      toast.success(res.msg);
-    } else {
-      toast.error(res.msg);
-    }
-  };
+    ? odemeler.reduce((n, { tutar }) => n + tutar, 0).toFixed(2)
+    : 0;
 
   const projeEditSubmitHandler = async (values: any) => {
-    const editProjeRecord = getChangedValues(values, projeInitialValues);
+    const editProjeRecord = getChangedValues(values, proje);
     try {
-      const res = await updateProje(
-        projeInitialValues.projeId,
-        editProjeRecord
-      );
+      const res = await updateProje(isletmeId, proje.id, editProjeRecord);
       handleResponseMsg(res);
       setSearchData((prevFormData: any) => ({
         ...prevFormData,
         id: values.isletmeId,
       }));
     } catch (error) {
-      toast.error("An error occurred while updating isletme.");
+      toast.error("Proje güncellenmedi, bir hata oluştu");
     } finally {
       setOpenEditProjeModal(false);
     }
@@ -191,19 +151,16 @@ const HomeTableRow = ({ data, index, setSearchData }: HomeTableRowProps) => {
       durum: values.durum,
     };
     try {
-      const res = await updateProje(
-        projeInitialValues.projeId,
-        editOdemeRecord
-      );
+      const res = await updateOdeme(editOdemeRecord);
       handleResponseMsg(res);
-      setOpenEditOdemeModal(false);
       setSearchData((prevFormData: any) => ({
         ...prevFormData,
         id: isletmeId,
       }));
-      toast.success("Ödeme güncellendi");
     } catch (error) {
-      toast.error("An error occurred while updating payment.");
+      toast.error("Ödeme güncellenmedi, bir hata oluştu");
+    } finally {
+      setOpenEditOdemeModal(false);
     }
   };
 
@@ -211,7 +168,7 @@ const HomeTableRow = ({ data, index, setSearchData }: HomeTableRowProps) => {
     try {
       const res = await deleteProje(isletmeId, projeId);
       handleResponseMsg(res);
-      setSearchData((prevFormData:any) => ({
+      setSearchData((prevFormData: any) => ({
         ...prevFormData,
         id: isletmeId,
       }));
@@ -220,15 +177,21 @@ const HomeTableRow = ({ data, index, setSearchData }: HomeTableRowProps) => {
         isOpen: false,
       }));
     } catch (error) {
-      toast.error("An error occurred while deleting project.");
+      toast.error("Proje Silinemedi, bir hata oluştu");
     }
   };
 
-  const odemeDeleteHandler = async ({ projeId, id }: { projeId: string; id: string }) => {
+  const odemeDeleteHandler = async ({
+    projeId,
+    odemeId,
+  }: {
+    projeId: string;
+    odemeId: string;
+  }) => {
     try {
-      const res = await deleteOdeme(isletmeId, projeId, id);
+      const res = await deleteOdeme(isletmeId, projeId, odemeId);
       handleResponseMsg(res);
-      setSearchData((prevFormData:any) => ({
+      setSearchData((prevFormData: any) => ({
         ...prevFormData,
         id: isletmeId,
       }));
@@ -237,12 +200,15 @@ const HomeTableRow = ({ data, index, setSearchData }: HomeTableRowProps) => {
         isOpen: false,
       }));
     } catch (error) {
-      toast.error("An error occurred while deleting payment.");
+      toast.error("Ödeme Silinemedi, bir hata oluştu");
     }
   };
 
   return (
     <Fragment>
+      {onayBoxInf.isOpen && (
+        <OnayBox onayBoxInf={onayBoxInf} setOnayBoxInf={setOnayBoxInf} />
+      )}
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
         <TableCell align="left" width="1%">
           <IconButton
@@ -255,12 +221,16 @@ const HomeTableRow = ({ data, index, setSearchData }: HomeTableRowProps) => {
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row" width="1%">
-          {index + 1}
+          {projeIndex + 1}
         </TableCell>
         <TableCell align="left" width="15%">
           {program}
         </TableCell>
-        <TableCell align="left" width="8%" sx={{ color: "success.main", fontWeight: 500 }}>
+        <TableCell
+          align="left"
+          width="8%"
+          sx={{ color: "success.main", fontWeight: 500 }}
+        >
           {dateFormat(baslamaTarihi)}
         </TableCell>
         <TableCell align="left" width="5%">
@@ -273,148 +243,166 @@ const HomeTableRow = ({ data, index, setSearchData }: HomeTableRowProps) => {
           {dateFormat(takipTarihi)}
         </TableCell>
         <Item name={durum} />
-        <TableCell align="left" width="10%" sx={{ color: "primary.main", fontWeight: 700 }}>
+        <TableCell
+          align="left"
+          width="10%"
+          sx={{ color: "primary.main", fontWeight: 700 }}
+        >
           {`${new Intl.NumberFormat("tr-TR", {
             minimumFractionDigits: 2,
-          }).format(totalPayment)} ₺`}
+          }).format(Number(totalPayment))} ₺`}
         </TableCell>
-        <TableCell align="right" width="15%">
+        <TableCell align="right" width="10%">
+          {odemeler?.length === 0 && (
+            <IconButton
+              size="small"
+              color="primary"
+              onClick={() => {
+                setOnayBoxInf({
+                  isOpen: true,
+                  content: "Proje silinsin mi ?",
+                  onClickHandler: () => projeDeleteHandler({ projeId: id }),
+                  functionData: { isletmeId },
+                });
+              }}
+            >
+              <DeleteIcon />
+            </IconButton>
+          )}
           <ModalIconButton
-            icon={<EditIcon />}
-            title="Proje Düzenle"
-            onClick={() => setOpenEditProjeModal(true)}
-          />
-          <ModalIconButton
-            icon={<DeleteIcon />}
-            title="Proje Sil"
-            onClick={() => {
-              setOnayBoxInf({
-                isOpen: true,
-                content: "Proje silinsin mi?",
-                onClickHandler: () => projeDeleteHandler({ projeId: id }),
-                functionData: { isletmeId },
-              });
-            }}
-          />
-        </TableCell>
-      </TableRow>
-
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
-          <Collapse in={openArrow} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                Ödemeler
-              </Typography>
-              <Table size="small">
-                <TableBody>
-                  {odemeler.map((odeme) => (
-                    <TableRow key={odeme.id}>
-                      <TableCell width="15%">
-                        {odeme.karekod}
-                      </TableCell>
-                      <TableCell width="15%">
-                        {dateFormat(odeme.tarih)}
-                      </TableCell>
-                      <TableCell width="10%">
-                        {`${new Intl.NumberFormat("tr-TR", {
-                          minimumFractionDigits: 2,
-                        }).format(odeme.tutar)} ₺`}
-                      </TableCell>
-                      <TableCell width="10%">
-                        {odeme.durum}
-                      </TableCell>
-                      <TableCell width="15%">
-                        <ModalIconButton
-                          icon={<EditIcon />}
-                          title="Ödeme Düzenle"
-                          onClick={() => {
-                            setInitalOdemeData(odeme);
-                            setOpenEditOdemeModal(true);
-                          }}
-                        />
-                        <ModalIconButton
-                          icon={<DeleteIcon />}
-                          title="Ödeme Sil"
-                          onClick={() => {
-                            setOnayBoxInf({
-                              isOpen: true,
-                              content: "Ödeme silinsin mi?",
-                              onClickHandler: () => odemeDeleteHandler({ projeId: id, id: odeme.id }),
-                              functionData: { isletmeId },
-                            });
-                          }}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-
-      {/* Proje Edit Modal */}
-      <Modal
-        open={openEditProjeModal}
-        onClose={() => setOpenEditProjeModal(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={modalStyle}>
-          <ProjeForm
-            onSubmit={projeEditSubmitHandler}
-            initialValues={projeInitialValues}
-            setOpenModal={setOpenEditProjeModal}
-          />
-        </Box>
-      </Modal>
-
-      {/* Ödeme Edit Modal */}
-      <Modal
-        open={openEditOdemeModal}
-        onClose={() => setOpenEditOdemeModal(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={modalStyle}>
-          <OdemeForm
-            onSubmit={odemeEditSubmitHandler}
-            initialValues={initalOdemeData}
-            setOpenModal={setOpenEditOdemeModal}
-          />
-        </Box>
-      </Modal>
-
-      {/* Onay Box */}
-      <Dialog
-        open={onayBoxInf.isOpen}
-        onClose={handleDialogClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">Onay</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {onayBoxInf.content}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose}>Hayır</Button>
-          <Button
-            onClick={() => {
-              onayBoxInf.onClickHandler(onayBoxInf.functionData);
-            }}
-            autoFocus
+            modalOpen={openEditProjeModal}
+            setModalOpen={setOpenEditProjeModal}
+            title={program}
           >
-            Evet
-          </Button>
-        </DialogActions>
-      </Dialog>
+            <ProjeForm
+              submitHandler={projeEditSubmitHandler}
+              updateForm={1}
+              initialData={proje}
+              buttonName="GÜNCELLE"
+            />
+          </ModalIconButton>
+        </TableCell>
+      </TableRow>
+      {odemeler && (
+        <TableRow>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+            <Collapse in={openArrow} timeout="auto" unmountOnExit>
+              <Box sx={{ margin: 1 }}>
+                <Table size="small">
+                  <TableBody>
+                    {odemeler.map((odeme, index) => (
+                      <TableRow
+                        key={odeme.id}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
+                        <TableCell component="th" scope="row" width="1%">
+                          {index + 1}
+                        </TableCell>
+                        <TableCell component="th" scope="row" width="20%">
+                          {odeme.destek}
+                        </TableCell>
+                        <TableCell width="5%">{odeme.karekod}</TableCell>
+                        <TableCell width="10%">
+                          {dateFormat(odeme.tarih)}
+                        </TableCell>
+                        <TableCell
+                          sx={{ color: "primary.main", fontWeight: 500 }}
+                          width="10%"
+                        >{`${new Intl.NumberFormat("tr-TR", {
+                          minimumFractionDigits: 2,
+                        }).format(odeme.tutar)} TL`}</TableCell>
+                        {odeme.durum === "ÖDENDİ" && (
+                          <TableCell
+                            width="10%"
+                            sx={{ color: "success.main", fontWeight: 500 }}
+                          >
+                            {odeme.durum}
+                          </TableCell>
+                        )}
+                        {odeme.durum === "BEKLEMEDE" && (
+                          <TableCell
+                            width="10%"
+                            sx={{ color: "error.main", fontWeight: 500 }}
+                          >
+                            {odeme.durum}
+                          </TableCell>
+                        )}
+                        <TableCell width="10%">
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() => {
+                              setOnayBoxInf({
+                                isOpen: true,
+                                content: "Ödeme silinsin mi?",
+                                onClickHandler: () =>
+                                  odemeDeleteHandler({
+                                    projeId: id,
+                                    odemeId: odeme.id,
+                                  }),
+                                functionData: { isletmeId },
+                              });
+                            }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                          <IconButton
+                            aria-label="edit"
+                            size="small"
+                            color="primary"
+                            onClick={() => {
+                              setOpenEditOdemeModal(true);
+                              setInitalOdemeData(odeme);
+                            }}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <Box
+                            sx={{
+                              outline: 0,
+                              border: "none",
+                            }}
+                          >
+                            <Modal
+                              open={openEditOdemeModal}
+                              onClose={() => setOpenEditOdemeModal(false)}
+                              sx={{
+                                "& .MuiBackdrop-root": {
+                                  backgroundColor: "transparent",
+                                },
+                              }}
+                              aria-labelledby="dataForm"
+                              aria-describedby="dataForm-description"
+                            >
+                              <Box sx={modalStyle}>
+                                <Typography variant="h6">
+                                  Ödeme Güncelle
+                                </Typography>
+                                <Divider sx={{ mb: 2 }} />
+                                <OdemeForm
+                                  submitHandler={odemeEditSubmitHandler}
+                                  updateForm={1}
+                                  initialData={initalOdemeData}
+                                  buttonName="GÜNCELLE"
+                                  isletme={isletme}
+                                />
+                              </Box>
+                            </Modal>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Box>
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      )}
     </Fragment>
   );
 };
 
 export default HomeTableRow;
-

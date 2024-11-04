@@ -48,10 +48,11 @@ const HomeTableSection: React.FC<HomeTableSectionProps> = ({
               <TableBody>
                 {isletme?.projeler?.toReversed().map((item, index) => (
                   <HomeTableRow
-                    data={item}
+                    proje={item}
                     key={item.id}
-                    index={index}
+                    projeIndex={index}
                     setSearchData={setSearchData}
+                    isletme={isletme}
                   />
                 ))}
               </TableBody>

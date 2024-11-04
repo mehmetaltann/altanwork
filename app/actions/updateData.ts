@@ -42,11 +42,15 @@ export const updateIsletme = async (
   }
 };
 
-export const updateProje = async (formData: any): Promise<UpdateResponse> => {
-  const { projeId, isletmeId } = formData;
+export const updateProje = async (
+  isletmeId: string,
+  projeId: string,
+  formData: any
+): Promise<UpdateResponse> => {
   const newData = Object.fromEntries(
-    Object.entries(formData.data).map(([k, v]) => [`projeler.$.${k}`, v])
+    Object.entries(formData).map(([k, v]) => [`projeler.$.${k}`, v])
   );
+  console.log(newData);
   try {
     await dbConnect();
     const updatedIsletme = await IsletmeModel.updateOne(
@@ -70,9 +74,14 @@ export const updateProje = async (formData: any): Promise<UpdateResponse> => {
 };
 
 export const updateOdeme = async (formData: any): Promise<UpdateResponse> => {
-  const { odemeId, projeId, isletmeId } = formData;
+  if (!formData) {
+    return {
+      msg: "Güncellenmiş Ödeme Dosyası Server'a Gelmedi",
+      status: false,
+    };
+  }
   const newData = Object.fromEntries(
-    Object.entries(formData.data).map(([k, v]) => [
+    Object.entries(formData).map(([k, v]) => [
       `projeler.$[].odemeler.$[p].${k}`,
       v,
     ])
@@ -81,14 +90,13 @@ export const updateOdeme = async (formData: any): Promise<UpdateResponse> => {
     await dbConnect();
     const updatedIsletme = await IsletmeModel.updateOne(
       {
-        id: isletmeId,
-        "projeler.odemeler.id": odemeId,
+        "projeler.odemeler.id": formData.id,
       },
       {
         $set: newData,
       },
       {
-        arrayFilters: [{ "p.id": odemeId }],
+        arrayFilters: [{ "p.id": formData.id }],
         upsert: true,
       }
     );

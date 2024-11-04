@@ -26,7 +26,6 @@ const HomeMain = () => {
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
       const { unvan, vergiNo, firmaId } = searchData;
-      console.log(unvan);
       if (unvan !== "") {
         const response = await fetchIsletme(unvan, "unvan");
         setIsletme(response.data);

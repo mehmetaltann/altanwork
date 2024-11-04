@@ -3,8 +3,12 @@ import Grid from "@mui/material/Grid2";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ModalButton from "@/components/modals/ModalButton";
 import IsletmeForm from "@/components/Forms/IsletmeForm";
-import OnayBox from "../../components/Ui/Onaybox";
+import OnayBox from "@/components/Ui/Onaybox";
+import { toast } from "react-toastify";
 import { useState, ChangeEvent } from "react";
+import { addIsletme } from "@/app/actions/insertData";
+import { deleteIsletme } from "@/app/actions/deleteData";
+import { handleResponseMsg } from "@/utils/toast-helper";
 import {
   Card,
   TextField,
@@ -13,8 +17,6 @@ import {
   Stack,
   IconButton,
 } from "@mui/material";
-import { addIsletme } from "@/app/actions/insertData";
-import { deleteIsletme } from "@/app/actions/deleteData";
 
 interface HomeSearchBarProps {
   searchData: {
@@ -66,28 +68,38 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
 
   const isletmeAddSubmitHandler = async (values: any) => {
     const isletmeId = "id" + Math.random().toString(20).slice(2);
-    const addIsletmeRecord = {
-      id: isletmeId,
-      unvan: values.unvan.toLocaleUpperCase("tr-TR"),
-      vergiNo: values.vergiNo,
-      sistemId: values.sistemId,
-      naceKodu: values.naceKodu,
-      yetkili: values.yetkili,
-      notlar: values.notlar,
-      adres: values.adres,
-      tel1: values.tel1,
-      tel2: values.tel2,
-      uets: values.uets,
-      mail: values.mail,
-      projeler: [],
-    };
-    const response = await addIsletme(addIsletmeRecord);
-    setOpenAddIsletmeModal(false);
-    setSearchData({
-      unvan: "",
-      vergiNo: values.vergiNo,
-      firmaId: "",
-    });
+    try {
+      const addIsletmeRecord = {
+        id: isletmeId,
+        unvan: values.unvan.toLocaleUpperCase("tr-TR"),
+        vergiNo: values.vergiNo,
+        sistemId: values.sistemId,
+        naceKodu: values.naceKodu,
+        yetkili: values.yetkili,
+        notlar: values.notlar,
+        adres: values.adres,
+        tel1: values.tel1,
+        tel2: values.tel2,
+        uets: values.uets,
+        mail: values.mail,
+        projeler: [],
+      };
+      const response = await addIsletme(addIsletmeRecord);
+      handleResponseMsg(response);
+      setOpenAddIsletmeModal(false);
+    } catch (error) {
+      toast.error("İşletme eklenemedi, bir hata oluştu");
+    } finally {
+      setOnayBoxInf((prevFormData) => ({
+        ...prevFormData,
+        isOpen: false,
+      }));
+      setSearchData({
+        unvan: "",
+        vergiNo: values.vergiNo,
+        firmaId: "",
+      });
+    }
   };
 
   const isletmeDeleteHandler = async ({ isletmeId }: { isletmeId: string }) => {
@@ -101,6 +113,9 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
 
   return (
     <Card>
+      {onayBoxInf.isOpen && (
+        <OnayBox onayBoxInf={onayBoxInf} setOnayBoxInf={setOnayBoxInf} />
+      )}
       <Stack
         sx={{ p: 1 }}
         alignItems={{ md: "center" }}
@@ -168,11 +183,11 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
                   size="small"
                   color="primary"
                   onClick={() => {
-                    const isletmeId = isletme.id;
+                    const isletmeId = isletme._id;
+                    console.log(isletmeId);
                     setOnayBoxInf({
-                      ...onayBoxInf,
                       isOpen: true,
-                      content: "İlgili İşletme Silinecek Onaylıyor musunuz?",
+                      content: "İlgili İşletme Silinecek Onaylıyor musunuz ?",
                       onClickHandler: isletmeDeleteHandler,
                       functionData: { isletmeId },
                     });
@@ -198,6 +213,8 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
             <IsletmeForm
               submitHandler={isletmeAddSubmitHandler}
               initialData={{
+                _id: "",
+                id: "",
                 unvan: "",
                 vergiNo: "",
                 sistemId: "",

@@ -11,21 +11,16 @@ interface OnayBoxProps {
   onayBoxInf: {
     isOpen: boolean;
     content: string;
-    onClickHandler: (data: { isletmeId: string }) => Promise<void>;
-    functionData: {
-      isletmeId?: string;
-    };
+    onClickHandler: (data: any) => void;
+    functionData: any;
   };
-  setOnayBoxInf: React.Dispatch<
-    React.SetStateAction<OnayBoxProps["onayBoxInf"]>
-  >;
+  setOnayBoxInf: React.Dispatch<React.SetStateAction<any>>;
 }
 
-const OnayBox: React.FC<OnayBoxProps> = ({ onayBoxInf, setOnayBoxInf }) => {
+const OnayBox = ({ onayBoxInf, setOnayBoxInf }: OnayBoxProps) => {
   const { isOpen, content, onClickHandler, functionData } = onayBoxInf;
-
-  const handleClose = () => {
-    setOnayBoxInf((prevFormData) => ({
+  const handleDialogClose = () => {
+    setOnayBoxInf((prevFormData: any) => ({
       ...prevFormData,
       isOpen: false,
     }));
@@ -34,9 +29,10 @@ const OnayBox: React.FC<OnayBoxProps> = ({ onayBoxInf, setOnayBoxInf }) => {
   return (
     <Dialog
       open={isOpen}
-      onClose={handleClose}
+      onClose={handleDialogClose}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
+      sx={{ p: 5 }}
     >
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
@@ -44,7 +40,7 @@ const OnayBox: React.FC<OnayBoxProps> = ({ onayBoxInf, setOnayBoxInf }) => {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="error">
+        <Button onClick={handleDialogClose} color="error">
           Hayır
         </Button>
         <Button

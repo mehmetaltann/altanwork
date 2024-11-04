@@ -5,7 +5,6 @@ import IsletmeModel from "@/lib/models/IsletmeModel";
 import UserModel from "@/lib/models/UserModel";
 import { revalidatePath } from "next/cache";
 import { DestekModel, ProgramModel } from "@/lib/models/ParametersModel";
-import { Odeme } from "@/lib/types/types";
 
 interface InsertResponse {
   msg: string;

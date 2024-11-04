@@ -12,6 +12,7 @@ interface DeleteResponse {
 
 // Delete Isletme function
 export const deleteIsletme = async (_id: string): Promise<DeleteResponse> => {
+  console.log(_id)
   try {
     if (!mongoose.Types.ObjectId.isValid(_id)) {
       return { msg: "Geçersiz ID formatı", status: false };

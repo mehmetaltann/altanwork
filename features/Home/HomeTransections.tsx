@@ -24,28 +24,10 @@ const HomeTransections: React.FC<HomeTransectionsProps> = ({
   const [openAddProjeModal, setOpenAddProjeModal] = useState(false);
   const [openAddOdemeModal, setOpenAddOdemeModal] = useState(false);
 
-  const isletmeInitialValues = {
-    _id: isletme._id,
-    unvan: isletme.unvan,
-    vergiNo: isletme.vergiNo,
-    sistemId: isletme.sistemId,
-    naceKodu: isletme.naceKodu,
-    yetkili: isletme.yetkili,
-    notlar: isletme.notlar ?? "",
-    adres: isletme.adres,
-    tel1: isletme.tel1 ?? "",
-    tel2: isletme.tel2 ?? "",
-    uets: isletme.uets ?? "",
-    mail: isletme.mail ?? "",
-  };
-
   const isletmeUpdatesubmitHandler = async (values: any) => {
     try {
-      const editIsletmeRecord = getChangedValues(values, isletmeInitialValues);
-      const res = await updateIsletme(
-        isletmeInitialValues._id,
-        editIsletmeRecord
-      );
+      const editIsletmeRecord: any = getChangedValues(values, isletme);
+      const res = await updateIsletme(isletme._id, editIsletmeRecord);
       handleResponseMsg(res);
       setSearchData((prevFormData: any) => ({
         ...prevFormData,
@@ -136,7 +118,7 @@ const HomeTransections: React.FC<HomeTransectionsProps> = ({
         >
           <IsletmeForm
             submitHandler={isletmeUpdatesubmitHandler}
-            initialData={isletmeInitialValues}
+            initialData={isletme}
             buttonName="GÜNCELLE"
           />
         </ModalButton>
