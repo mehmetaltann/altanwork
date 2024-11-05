@@ -7,22 +7,11 @@ import { Form, Formik, Field } from "formik";
 import { Stack, MenuItem, Button } from "@mui/material";
 import { useEffect, useCallback, useState } from "react";
 import { fetchPrograms } from "@/app/actions/fetchData";
-import { Parameter } from "@/lib/types/types";
-
-interface InitialData {
-  program?: string;
-  baslamaTarihi?: string;
-  sure?: string;
-  tamamlanmaTarihi?: string;
-  takipTarihi?: string;
-  izleyici?: string;
-  notlar?: string;
-  durum?: string;
-}
+import { Parameter, ProjeWithoutId } from "@/lib/types/types";
 
 interface ProjeFormProps {
-  initialData: InitialData;
-  submitHandler: (values: InitialData) => void;
+  initialData: ProjeWithoutId;
+  submitHandler: (values: ProjeWithoutId) => void;
   updateForm?: number;
   buttonName?: string;
 }

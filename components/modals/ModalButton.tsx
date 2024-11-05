@@ -21,6 +21,7 @@ interface ModalButtonProps {
   maxh?: string;
   title: string;
   height?: { md: string; xs: string };
+  minHeight: { md: string; xs: string; lg: string };
   color?:
     | "inherit"
     | "primary"
@@ -44,6 +45,7 @@ const ModalButton: React.FC<ModalButtonProps> = ({
   maxW = "35vh",
   maxh = "7vh",
   title,
+  minHeight = { md: "40vh", xs: "40vh", lg: "40vh" },
   height = { md: "70vh", xs: "80vh" },
   color = "primary",
   endIconLogo = "send",
@@ -58,6 +60,7 @@ const ModalButton: React.FC<ModalButtonProps> = ({
     position: "absolute",
     top: "50%",
     left: "50%",
+    minHeight: minHeight,
     height: height,
     width: { xs: "85%", sm: "65%", md: "60%", lg: "40%", xl: "35%" },
     overflow: "auto",
@@ -75,7 +78,7 @@ const ModalButton: React.FC<ModalButtonProps> = ({
         size={size}
         variant={variant}
         startIcon={icon}
-        endIcon={iconMap[endIconLogo] || iconMap.send} // Fallback to SendIcon
+        endIcon={iconMap[endIconLogo] || iconMap.send}
         sx={{
           minWidth: minW,
           maxWidth: maxW,

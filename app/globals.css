@@ -1,17 +1,11 @@
-
-.fc-event-main-frame {
-  white-space: normal;
-}
-
-.fc-day-grid-event > .fc-content {
-  white-space: normal;
-}
-
-.fc-toolbar-title {
-  color: var(--secondaryColor);
-  font-size: 1rem;
-}
-
 thead {
   position: sticky;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
+  -webkit-text-fill-color: #000 !important;
 }

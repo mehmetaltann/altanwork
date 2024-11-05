@@ -12,7 +12,6 @@ interface DeleteResponse {
 
 // Delete Isletme function
 export const deleteIsletme = async (_id: string): Promise<DeleteResponse> => {
-  console.log(_id)
   try {
     if (!mongoose.Types.ObjectId.isValid(_id)) {
       return { msg: "Geçersiz ID formatı", status: false };
@@ -52,8 +51,8 @@ export const deleteOdeme = async (
   try {
     await dbConnect();
     const result = await IsletmeModel.updateOne(
-      { id: isletmeId, "projeler.id": projeId },
-      { $pull: { "projeler.$.odemeler": { id: odemeId } } }
+      { _id: isletmeId, "projeler._id": projeId },
+      { $pull: { "projeler.$.odemeler": { _id: odemeId } } }
     );
     if (result.modifiedCount === 0) {
       return { msg: "Ödeme bulunamadı", status: false };
@@ -83,8 +82,8 @@ export const deleteProje = async (
   try {
     await dbConnect();
     const result = await IsletmeModel.updateOne(
-      { id: isletmeId },
-      { $pull: { projeler: { id: projeId } } }
+      { _id: isletmeId },
+      { $pull: { projeler: { _id: projeId } } }
     );
     if (result.modifiedCount === 0) {
       return { msg: "Proje bulunamadı", status: false };
@@ -103,7 +102,6 @@ export const deleteProje = async (
   }
 };
 
-// Generic deletion function for items
 const deleteItem = async (
   model: any,
   _id: string,
@@ -111,7 +109,6 @@ const deleteItem = async (
 ): Promise<DeleteResponse> => {
   try {
     await dbConnect();
-    console.log(_id);
     const result = await model.findByIdAndDelete(_id);
     if (!result) {
       return { msg: `${itemName} bulunamadı`, status: false };

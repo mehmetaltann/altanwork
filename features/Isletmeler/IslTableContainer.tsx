@@ -2,12 +2,27 @@
 import IslDataTable from "./IslDataTable";
 import { DataTableWrapper } from "@/components/Layouts/Wrappers";
 import { Typography, Paper, Stack } from "@mui/material";
-import { Isletme } from "@/lib/types/types";
+import { DisplayIsletmes } from "@/lib/types/types";
+import { useEffect, useState } from "react";
+import { fetchIsletmeler } from "@/app/actions/fetchData";
+import { Loader } from "@/components/Ui/Loader";
 
-const IslTableContainer = ({ isletmeler }: { isletmeler: Isletme[] }) => {
-  if (!isletmeler || isletmeler.length === 0) {
-    return <Typography>No data available</Typography>;
-  }
+const IslTableContainer: React.FC = () => {
+  const [isletmeler, setIsletmeler] = useState<DisplayIsletmes[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchIsletmeler();
+        setIsletmeler(response);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+    const timeoutId = setTimeout(fetchData, 200);
+
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   return (
     <Paper>
@@ -21,9 +36,13 @@ const IslTableContainer = ({ isletmeler }: { isletmeler: Isletme[] }) => {
           İşletmeler
         </Typography>
       </Stack>
-      <DataTableWrapper tableHeight={"78vh"} sx={{ p: { xs: 1, md: 2 } }}>
-        <IslDataTable isletmeler={isletmeler} />
-      </DataTableWrapper>
+      {!isletmeler || isletmeler?.length < 1 ? (
+        <Loader />
+      ) : (
+        <DataTableWrapper tableHeight={"78vh"} sx={{ p: { xs: 1, md: 2 } }}>
+          <IslDataTable isletmeler={isletmeler} />
+        </DataTableWrapper>
+      )}
     </Paper>
   );
 };

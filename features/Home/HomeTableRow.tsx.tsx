@@ -5,7 +5,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ProjeForm from "@/components/Forms/ProjeForm";
 import OdemeForm from "@/components/Forms/OdemeForm";
 import ModalIconButton from "@/components/modals/ModalIconButton";
-import OnayBox from "@/components/Ui/Onaybox";
+import OnayBox from "@/components/Ui/OnayBox";
 import { toast } from "react-toastify";
 import { getChangedValues, dateFormat } from "@/utils/helpers";
 import { Fragment, useState } from "react";
@@ -41,30 +41,20 @@ const modalStyle = {
 };
 
 function Item({ name }: { name: string }) {
-  if (name === "Devam Ediyor") {
-    return (
-      <TableCell width="10%" sx={{ color: "success.main", fontWeight: 500 }}>
-        {name}
-      </TableCell>
-    );
-  } else if (
-    name === "Durduruldu" ||
-    name === "Başarısız Tamamlandı" ||
-    name === "Bilgi Yok"
-  ) {
-    return (
-      <TableCell width="10%" sx={{ color: "error.main", fontWeight: 500 }}>
-        {name}
-      </TableCell>
-    );
-  } else if (name === "Başarıyla Tamamlandı") {
-    return (
-      <TableCell width="10%" sx={{ color: "info.main", fontWeight: 500 }}>
-        {name}
-      </TableCell>
-    );
-  }
-  return null;
+  const colorMap: { [key: string]: string } = {
+    "Devam Ediyor": "success.main",
+    "Başarıyla Tamamlandı": "info.main",
+    Durduruldu: "error.main",
+    "Başarısız Tamamlandı": "error.main",
+    "Bilgi Yok": "error.main",
+  };
+  const color = colorMap[name] || "inherit";
+
+  return (
+    <TableCell width="10%" sx={{ color: color, fontWeight: 500 }}>
+      {name}
+    </TableCell>
+  );
 }
 
 interface OnayBoxInf {
@@ -90,8 +80,7 @@ const HomeTableRow = ({
   isletme,
 }: HomeTableRowProps) => {
   const {
-    id,
-    isletmeId,
+    _id,
     baslamaTarihi,
     tamamlanmaTarihi,
     takipTarihi,
@@ -107,9 +96,7 @@ const HomeTableRow = ({
     _id: "",
     destek: "",
     durum: "",
-    id: "",
     karekod: "",
-    projeId: "",
     tarih: "",
     tutar: 0,
   });
@@ -127,13 +114,14 @@ const HomeTableRow = ({
     : 0;
 
   const projeEditSubmitHandler = async (values: any) => {
+    delete proje.odemeler;
     const editProjeRecord = getChangedValues(values, proje);
     try {
-      const res = await updateProje(isletmeId, proje.id, editProjeRecord);
+      const res = await updateProje(isletme._id, proje._id, editProjeRecord);
       handleResponseMsg(res);
       setSearchData((prevFormData: any) => ({
         ...prevFormData,
-        id: values.isletmeId,
+        _id: isletme._id,
       }));
     } catch (error) {
       toast.error("Proje güncellenmedi, bir hata oluştu");
@@ -144,7 +132,7 @@ const HomeTableRow = ({
 
   const odemeEditSubmitHandler = async (values: any) => {
     const editOdemeRecord = {
-      id: values.id,
+      _id: initalOdemeData._id,
       karekod: values.karekod.toUpperCase(),
       tarih: values.tarih,
       tutar: values.tutar,
@@ -153,12 +141,12 @@ const HomeTableRow = ({
     try {
       const res = await updateOdeme(editOdemeRecord);
       handleResponseMsg(res);
-      setSearchData((prevFormData: any) => ({
-        ...prevFormData,
-        id: isletmeId,
+      setSearchData((prev: any) => ({
+        ...prev,
+        _id: isletme._id,
       }));
     } catch (error) {
-      toast.error("Ödeme güncellenmedi, bir hata oluştu");
+      toast.error("Ödeme güncellenemedi, bir hata oluştu");
     } finally {
       setOpenEditOdemeModal(false);
     }
@@ -166,16 +154,13 @@ const HomeTableRow = ({
 
   const projeDeleteHandler = async ({ projeId }: { projeId: string }) => {
     try {
-      const res = await deleteProje(isletmeId, projeId);
+      const res = await deleteProje(isletme._id, projeId);
       handleResponseMsg(res);
       setSearchData((prevFormData: any) => ({
         ...prevFormData,
-        id: isletmeId,
+        __id: isletme._id,
       }));
-      setOnayBoxInf((prevFormData) => ({
-        ...prevFormData,
-        isOpen: false,
-      }));
+      setOnayBoxInf((prev) => ({ ...prev, isOpen: false }));
     } catch (error) {
       toast.error("Proje Silinemedi, bir hata oluştu");
     }
@@ -189,16 +174,13 @@ const HomeTableRow = ({
     odemeId: string;
   }) => {
     try {
-      const res = await deleteOdeme(isletmeId, projeId, odemeId);
+      const res = await deleteOdeme(isletme._id, projeId, odemeId);
       handleResponseMsg(res);
       setSearchData((prevFormData: any) => ({
         ...prevFormData,
-        id: isletmeId,
+        _id: isletme._id,
       }));
-      setOnayBoxInf((prevFormData) => ({
-        ...prevFormData,
-        isOpen: false,
-      }));
+      setOnayBoxInf((prev) => ({ ...prev, isOpen: false }));
     } catch (error) {
       toast.error("Ödeme Silinemedi, bir hata oluştu");
     }
@@ -258,10 +240,11 @@ const HomeTableRow = ({
               size="small"
               color="primary"
               onClick={() => {
+                const isletmeId = isletme._id;
                 setOnayBoxInf({
                   isOpen: true,
                   content: "Proje silinsin mi ?",
-                  onClickHandler: () => projeDeleteHandler({ projeId: id }),
+                  onClickHandler: () => projeDeleteHandler({ projeId: _id }),
                   functionData: { isletmeId },
                 });
               }}
@@ -292,7 +275,7 @@ const HomeTableRow = ({
                   <TableBody>
                     {odemeler.map((odeme, index) => (
                       <TableRow
-                        key={odeme.id}
+                        key={index}
                         sx={{
                           "&:last-child td, &:last-child th": { border: 0 },
                         }}
@@ -334,13 +317,14 @@ const HomeTableRow = ({
                             size="small"
                             color="primary"
                             onClick={() => {
+                              const isletmeId = isletme._id;
                               setOnayBoxInf({
                                 isOpen: true,
                                 content: "Ödeme silinsin mi?",
                                 onClickHandler: () =>
                                   odemeDeleteHandler({
-                                    projeId: id,
-                                    odemeId: odeme.id,
+                                    projeId: _id,
+                                    odemeId: odeme._id,
                                   }),
                                 functionData: { isletmeId },
                               });

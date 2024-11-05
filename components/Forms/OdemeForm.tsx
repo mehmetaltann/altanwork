@@ -7,20 +7,11 @@ import { Form, Formik, Field } from "formik";
 import { Stack, MenuItem, Button } from "@mui/material";
 import { Fragment, useEffect, useCallback, useState } from "react";
 import { fetchDesteks } from "@/app/actions/fetchData";
-import { Isletme, Parameter } from "@/lib/types/types";
-
-interface InitialData {
-  projeId?: string;
-  tarih?: string;
-  karekod?: string;
-  tutar?: number;
-  destek?: string;
-  durum?: string;
-}
+import { Isletme, Parameter, OdemeWithoutId } from "@/lib/types/types";
 
 interface OdemeFormProps {
-  initialData: InitialData;
-  submitHandler: (values: InitialData) => void;
+  initialData: OdemeWithoutId;
+  submitHandler: (values: OdemeWithoutId) => void;
   isletme: Isletme;
   updateForm?: number;
   buttonName?: string;
@@ -69,8 +60,8 @@ const OdemeForm: React.FC<OdemeFormProps> = ({
               <Fragment>
                 <Field name="projeId" component={FormSelect} label="Program">
                   {isletme.projeler?.map(
-                    ({ program, baslamaTarihi, id }, index) => (
-                      <MenuItem value={id} key={index}>
+                    ({ program, baslamaTarihi, _id }, index) => (
+                      <MenuItem value={_id} key={index}>
                         {program} -{" "}
                         {new Date(baslamaTarihi).toLocaleDateString()}
                       </MenuItem>

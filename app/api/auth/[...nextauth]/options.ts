@@ -9,8 +9,8 @@ export const options: NextAuthOptions = {
     CredentialsProvider({
       name: "Email",
       credentials: {
-        email: { label: "Email", type: "email", required: true },
-        password: { label: "Şifre", type: "password", required: true },
+        email: { label: "Email", type: "email" },
+        password: { label: "Şifre", type: "password" },
       },
       async authorize(credentials) {
         const { email, password } = credentials || {};
@@ -51,8 +51,7 @@ export const options: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token && token.id) {
-        session.user = session.user || {};
+      if (token) {
         session.user.id = token.id;
       }
       return session;

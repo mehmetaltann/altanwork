@@ -14,9 +14,6 @@ export const GlobalTheme = createTheme({
     },
   },
   typography: {
-    button: {
-      textTransform: "none",
-    },
     fontFamily: "var(--font-roboto)",
   },
 });

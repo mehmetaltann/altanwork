@@ -37,9 +37,11 @@ export const getChangedValues = <T extends Record<string, any>>(
   initialValues: T
 ): Partial<T> => {
   return Object.entries(values).reduce((acc, [key, value]) => {
-    // Check if the current value is different from the initial value
-    if (initialValues[key] !== value) {
-      // Type assertion to tell TypeScript that key is definitely a key of T
+    if (
+      initialValues[key] !== value &&
+      initialValues[key] !== "projeler" &&
+      initialValues[key] !== "odemeler"
+    ) {
       acc[key as keyof T] = value;
     }
     return acc;

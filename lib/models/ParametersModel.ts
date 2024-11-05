@@ -2,10 +2,6 @@ import mongoose, { Model, Schema } from "mongoose";
 import { Parameter } from "../types/types";
 
 const ProgramSchema = new Schema<Parameter>({
-  id: {
-    type: String,
-    required: true,
-  },
   isim: {
     type: String,
     required: true,
@@ -13,10 +9,6 @@ const ProgramSchema = new Schema<Parameter>({
 });
 
 const DestekSchema = new Schema<Parameter>({
-  id: {
-    type: String,
-    required: true,
-  },
   isim: {
     type: String,
     required: true,

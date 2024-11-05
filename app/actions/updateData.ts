@@ -2,7 +2,6 @@
 import mongoose from "mongoose";
 import dbConnect from "@/lib/db/dbConnect";
 import IsletmeModel from "@/lib/models/IsletmeModel";
-import { Isletme } from "@/lib/types/types";
 import { revalidatePath } from "next/cache";
 
 interface UpdateResponse {
@@ -20,7 +19,7 @@ export const updateIsletme = async (
   try {
     await dbConnect();
     const updatedIsletme = await IsletmeModel.updateOne(
-      { _id: _id },
+      { _id },
       {
         $set: formData,
       }
@@ -50,11 +49,10 @@ export const updateProje = async (
   const newData = Object.fromEntries(
     Object.entries(formData).map(([k, v]) => [`projeler.$.${k}`, v])
   );
-  console.log(newData);
   try {
     await dbConnect();
     const updatedIsletme = await IsletmeModel.updateOne(
-      { id: isletmeId, "projeler.id": projeId },
+      { _id: isletmeId, "projeler._id": projeId },
       { $set: newData }
     );
     if (!updatedIsletme) {
@@ -90,13 +88,13 @@ export const updateOdeme = async (formData: any): Promise<UpdateResponse> => {
     await dbConnect();
     const updatedIsletme = await IsletmeModel.updateOne(
       {
-        "projeler.odemeler.id": formData.id,
+        "projeler.odemeler._id": formData._id,
       },
       {
         $set: newData,
       },
       {
-        arrayFilters: [{ "p.id": formData.id }],
+        arrayFilters: [{ "p._id": formData._id }],
         upsert: true,
       }
     );

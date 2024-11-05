@@ -1,5 +1,4 @@
 "use client";
-import * as Yup from "yup";
 import FormTextField from "@/components/Ui/FormTextField";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
@@ -32,17 +31,6 @@ interface ProgramProps {
 const Destekler: React.FC<ProgramProps> = ({ programlar }) => {
   const [loading, setLoading] = useState(false);
 
-  const submitHandler = async (values: { isim: string }) => {
-    let programId = "id" + Math.random().toString(20).slice(2);
-    const newProgramRecord = { isim: values.isim, id: programId };
-    const res = await addProgram(newProgramRecord);
-    handleResponseMsg(res);
-  };
-
-  const validateSchema = Yup.object().shape({
-    isim: Yup.string().required("Gerekli").min(4, "En az 4 Karakter"),
-  });
-
   return (
     <Card sx={{ p: 3 }}>
       <Grid container spacing={2}>
@@ -56,8 +44,10 @@ const Destekler: React.FC<ProgramProps> = ({ programlar }) => {
             initialValues={{
               isim: "",
             }}
-            onSubmit={submitHandler}
-            validationSchema={validateSchema}
+            onSubmit={async (values) => {
+              const res = await addProgram(values.isim);
+              handleResponseMsg(res);
+            }}
           >
             {({ isSubmitting }) => (
               <Form>

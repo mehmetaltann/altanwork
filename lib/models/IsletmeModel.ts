@@ -10,15 +10,7 @@ const OdemeSchema = new Schema<Odeme>({
     type: String,
     required: true,
   },
-  id: {
-    type: String,
-    required: true,
-  },
   karekod: {
-    type: String,
-    required: true,
-  },
-  projeId: {
     type: String,
     required: true,
   },
@@ -39,14 +31,6 @@ const ProjeSchema = new Schema<Proje>({
     required: true,
   },
   durum: {
-    type: String,
-    required: true,
-  },
-  id: {
-    type: String,
-    required: true,
-  },
-  isletmeId: {
     type: String,
     required: true,
   },
@@ -93,10 +77,6 @@ const IsletmeSchema = new Schema<Isletme>({
     required: true,
   },
   mail: {
-    type: String,
-    required: true,
-  },
-  id: {
     type: String,
     required: true,
   },

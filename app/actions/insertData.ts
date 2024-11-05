@@ -5,6 +5,7 @@ import IsletmeModel from "@/lib/models/IsletmeModel";
 import UserModel from "@/lib/models/UserModel";
 import { revalidatePath } from "next/cache";
 import { DestekModel, ProgramModel } from "@/lib/models/ParametersModel";
+import { ProjeWithoutId } from "@/lib/types/types";
 
 interface InsertResponse {
   msg: string;
@@ -39,13 +40,14 @@ export const addIsletme = async (formData: any): Promise<InsertResponse> => {
   }
 };
 
-export const addProje = async (formData: any): Promise<InsertResponse> => {
-  const { isletmeId } = formData;
-
+export const addProje = async (
+  isletmeId: string,
+  formData: ProjeWithoutId
+): Promise<InsertResponse> => {
   try {
     await dbConnect();
     const result = await IsletmeModel.updateOne(
-      { id: isletmeId },
+      { _id: isletmeId },
       { $push: { projeler: formData } }
     );
     if (result.modifiedCount === 0) {
@@ -65,12 +67,15 @@ export const addProje = async (formData: any): Promise<InsertResponse> => {
   }
 };
 
-export const addOdeme = async (formData: any): Promise<InsertResponse> => {
-  const { isletmeId, projeId } = formData;
+export const addOdeme = async (
+  isletmeId: string,
+  projeId: string,
+  formData: any
+): Promise<InsertResponse> => {
   try {
     await dbConnect();
     const result = await IsletmeModel.updateOne(
-      { id: isletmeId, "projeler.id": projeId },
+      { _id: isletmeId, "projeler._id": projeId },
       {
         $push: { "projeler.$.odemeler": formData },
       }
@@ -123,20 +128,15 @@ export const addUser = async (
   }
 };
 
-export const addEntry = async (
-  model: any,
-  formData: any,
-  path: string
-): Promise<InsertResponse> => {
+export const addProgram = async (isim: string): Promise<InsertResponse> => {
   try {
     await dbConnect();
-    await model.create(formData);
-    revalidatePath(path);
-    return { msg: "Girdi başarıyla eklendi", status: true };
+    await ProgramModel.create({ isim });
+    revalidatePath("/parametreler");
+    return { msg: "Program Başarıyla Eklendi", status: true };
   } catch (error) {
-    console.error(`Girdi eklenemedi: ${error}`);
     return {
-      msg: `Girdi eklenemedi: ${
+      msg: `Program eklenemedi: ${
         error instanceof Error ? error.message : "Bilinmeyen hata"
       }`,
       status: false,
@@ -144,10 +144,18 @@ export const addEntry = async (
   }
 };
 
-export const addProgram = async (formData: any): Promise<InsertResponse> => {
-  return addEntry(ProgramModel, formData, "/parametreler");
-};
-
-export const addDestek = async (formData: any): Promise<InsertResponse> => {
-  return addEntry(DestekModel, formData, "/parametreler");
+export const addDestek = async (isim: string): Promise<InsertResponse> => {
+  try {
+    await dbConnect();
+    await DestekModel.create({ isim });
+    revalidatePath("/parametreler");
+    return { msg: "Destek Başarıyla Eklendi", status: true };
+  } catch (error) {
+    return {
+      msg: `Destek eklenemedi: ${
+        error instanceof Error ? error.message : "Bilinmeyen hata"
+      }`,
+      status: false,
+    };
+  }
 };

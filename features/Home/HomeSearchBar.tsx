@@ -3,7 +3,7 @@ import Grid from "@mui/material/Grid2";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ModalButton from "@/components/modals/ModalButton";
 import IsletmeForm from "@/components/Forms/IsletmeForm";
-import OnayBox from "@/components/Ui/Onaybox";
+import OnayBox from "@/components/Ui/OnayBox";
 import { toast } from "react-toastify";
 import { useState, ChangeEvent } from "react";
 import { addIsletme } from "@/app/actions/insertData";
@@ -67,10 +67,8 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
   };
 
   const isletmeAddSubmitHandler = async (values: any) => {
-    const isletmeId = "id" + Math.random().toString(20).slice(2);
     try {
       const addIsletmeRecord = {
-        id: isletmeId,
         unvan: values.unvan.toLocaleUpperCase("tr-TR"),
         vergiNo: values.vergiNo,
         sistemId: values.sistemId,
@@ -87,28 +85,37 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
       const response = await addIsletme(addIsletmeRecord);
       handleResponseMsg(response);
       setOpenAddIsletmeModal(false);
-    } catch (error) {
-      toast.error("İşletme eklenemedi, bir hata oluştu");
-    } finally {
-      setOnayBoxInf((prevFormData) => ({
-        ...prevFormData,
-        isOpen: false,
-      }));
       setSearchData({
         unvan: "",
         vergiNo: values.vergiNo,
         firmaId: "",
       });
+    } catch (error) {
+      toast.error("İşletme eklenemedi, bir hata oluştu");
+    } finally {
+      setOnayBoxInf((prev) => ({
+        ...prev,
+        isOpen: false,
+      }));
     }
   };
 
   const isletmeDeleteHandler = async ({ isletmeId }: { isletmeId: string }) => {
-    const response = await deleteIsletme(isletmeId);
-    setSearchData({
-      unvan: "",
-      vergiNo: "",
-      firmaId: "",
-    });
+    try {
+      const res = await deleteIsletme(isletmeId);
+      handleResponseMsg(res);
+      setSearchData({
+        unvan: "",
+        vergiNo: "",
+        firmaId: "",
+      });
+      setOnayBoxInf((prev) => ({
+        ...prev,
+        isOpen: false,
+      }));
+    } catch (error) {
+      toast.error("İşletme Silinemedi, bir hata oluştu");
+    }
   };
 
   return (
@@ -177,17 +184,16 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
                 onChange={handleInputsChange}
               />
             </Grid>
-            {isletme?.projeler.length === 0 && (
+            {isletme && isletme.projeler?.length === 0 && (
               <Grid>
                 <IconButton
                   size="small"
                   color="primary"
                   onClick={() => {
                     const isletmeId = isletme._id;
-                    console.log(isletmeId);
                     setOnayBoxInf({
                       isOpen: true,
-                      content: "İlgili İşletme Silinecek Onaylıyor musunuz ?",
+                      content: "İlgili İşletme Silinecek Onaylıyor musunuz?",
                       onClickHandler: isletmeDeleteHandler,
                       functionData: { isletmeId },
                     });
@@ -209,12 +215,12 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
             setModalOpen={setOpenAddIsletmeModal}
             size="large"
             endIconLogo="addnew"
+            minHeight={{ md: "50vh", xs: "50vh", lg: "30vh" }}
           >
             <IsletmeForm
               submitHandler={isletmeAddSubmitHandler}
               initialData={{
                 _id: "",
-                id: "",
                 unvan: "",
                 vergiNo: "",
                 sistemId: "",

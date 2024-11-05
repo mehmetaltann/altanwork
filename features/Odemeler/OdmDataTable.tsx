@@ -1,40 +1,43 @@
 import DataTableFrame from "@/components/Tables/DataTableFrame";
 import DeleteIcon from "@mui/icons-material/Delete";
+import OnayBox from "@/components/Ui/OnayBox";
 import { toast } from "react-toastify";
 import { GridRenderCellParams } from "@mui/x-data-grid";
-import { useEffect, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { dateFormatNormal } from "@/utils/helpers";
-import {
-  IconButton,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Button,
-} from "@mui/material";
+import { IconButton } from "@mui/material";
+import { deleteOdeme } from "@/app/actions/deleteData";
+import { DisplayOdemes } from "@/lib/types/types";
+import { handleResponseMsg } from "@/utils/toast-helper";
+import { updateOdeme } from "@/app/actions/updateData";
 import {
   stringColumn,
   actionColumn,
   dateColumn,
   priceColumn,
 } from "@/components/Tables/columns";
-import { deleteOdeme } from "@/app/actions/deleteData";
+
+interface OnayBoxInf {
+  isOpen: boolean;
+  content: string;
+  onClickHandler: () => Promise<void>;
+  functionData: { [key: string]: any };
+}
+
+interface OdmDataTableProps {
+  odemeler: DisplayOdemes[];
+}
 
 const useFakeMutation = () => {
   return useCallback(
-    (item) =>
-      new Promise((resolve, reject) => {
+    (item: DisplayOdemes) =>
+      new Promise<DisplayOdemes>((resolve, reject) => {
         setTimeout(() => {
-          if (item.id?.trim() === "") {
-            reject(new Error("Karekod Boş Olamaz"));
+          if (item.karekod?.trim() === "") {
+            reject(new Error("Karekod No Boş Olamaz"));
           } else {
             resolve({
-              id: item.id,
-              karekod: item.karekod,
-              tarih: item.tarih,
-              tutar: item.tutar,
-              durum: item.durum,
+              ...item,
             });
           }
         }, 200);
@@ -43,84 +46,58 @@ const useFakeMutation = () => {
   );
 };
 
-const OdmDataTable = ({ odemeDurum, odemeler }) => {
+const OdmDataTable: React.FC<OdmDataTableProps> = ({ odemeler }) => {
   const [onayBoxInf, setOnayBoxInf] = useState<OnayBoxInf>({
     isOpen: false,
     content: "",
     onClickHandler: async () => {},
     functionData: {},
   });
+
   const mutateRow = useFakeMutation();
 
-  const fetchOdemeData = useCallback(async () => {
-    await axiosFetch({
-      method: "GET",
-      url: "/odemeler/" + odemeDurum,
-    });
-  }, [odemeDurum]);
-
-  useEffect(() => {
-    fetchOdemeData();
-  }, [odemeDurum]);
-
   const processRowUpdate = useCallback(
-    async (newRow) => {
+    async (newRow: DisplayOdemes) => {
       const newRecord = {
-        id: newRow.id,
-        isletmeId: newRow.isletmeId,
-        projeId: newRow.projeId,
+        _id: newRow.id,
         karekod: newRow.karekod,
         tarih: dateFormatNormal(newRow.tarih),
         tutar: newRow.tutar,
         durum: newRow.durum,
       };
-      await axiosFetch({
-        method: "POST",
-        url:
-          "/odemeguncelle/" +
-          newRecord.isletmeId +
-          "/" +
-          newRecord.projeId +
-          "/" +
-          newRecord.id,
-        requestConfig: {
-          data: newRecord,
-        },
-      });
-      setOpenSnack(true);
-      fetchOdemeData();
-      const res = await mutateRow(newRow);
-      return res;
+      try {
+        const res = await updateOdeme(newRecord);
+        handleResponseMsg(res);
+        const res2 = await mutateRow(newRow);
+        return res2;
+      } catch (error) {
+        toast.error("Güncelleme sırasında hata oluştu.");
+        throw error;
+      }
     },
-
     [mutateRow]
   );
 
-  const handleDialogClose = () => {
-    setOnayBoxInf((prevFormData) => ({
-      ...prevFormData,
-      isOpen: false,
-    }));
-  };
-
-  const odemeDeleteHandler = async ({ isletmeId }: { isletmeId: string }) => {
+  const odemeDeleteHandler = async ({
+    isletmeId,
+    projeId,
+    odemeId,
+  }: {
+    isletmeId: string;
+    projeId: string;
+    odemeId: string;
+  }) => {
     try {
-      const response = await deleteOdeme(id, projeId, isletmeId);
-      console.log(response);
-      if (response.status) {
-        toast.success(response.msg);
-        handleDialogClose();
-      } else {
-        toast.error(response.msg);
-      }
+      const response = await deleteOdeme(isletmeId, projeId, odemeId);
+      handleResponseMsg(response);
+      setOnayBoxInf((prev) => ({ ...prev, isOpen: false }));
     } catch (error) {
-      console.error(error);
-      toast.error("Bir hata oluştu. Lütfen tekrar deneyin.");
+      toast.error(`Ödeme Silinemedi, Bir hata oluştu : ${error}`);
     }
   };
 
-  const handleProcessRowUpdateError = useCallback((error) => {
-    response.message = error;
+  const handleProcessRowUpdateError = useCallback((error: Error) => {
+    toast.error(error.message);
   }, []);
 
   const columns = [
@@ -159,7 +136,7 @@ const OdmDataTable = ({ odemeDurum, odemeler }) => {
       renderCell: (params: GridRenderCellParams, index: number) => {
         const isletmeId = params.row.isletmeId;
         const projeId = params.row.projeId;
-        const id = params.row.id;
+        const odemeId = params.row.id;
         return (
           <IconButton
             key={index}
@@ -169,8 +146,9 @@ const OdmDataTable = ({ odemeDurum, odemeler }) => {
               setOnayBoxInf({
                 isOpen: true,
                 content: "İlgili Ödeme Silinecek Onaylıyor musunuz ?",
-                onClickHandler: odemeDeleteHandler,
-                functionData: { id, projeId, isletmeId },
+                onClickHandler: () =>
+                  odemeDeleteHandler({ isletmeId, projeId, odemeId }),
+                functionData: { isletmeId },
               });
             }}
           >
@@ -184,6 +162,9 @@ const OdmDataTable = ({ odemeDurum, odemeler }) => {
   return (
     <>
       <div style={{ height: "100%", width: "100%" }}>
+        {onayBoxInf.isOpen && (
+          <OnayBox onayBoxInf={onayBoxInf} setOnayBoxInf={setOnayBoxInf} />
+        )}
         <DataTableFrame
           getRowHeight={() => "auto"}
           getEstimatedRowHeight={() => 200}
@@ -197,28 +178,6 @@ const OdmDataTable = ({ odemeDurum, odemeler }) => {
           onProcessRowUpdateError={handleProcessRowUpdateError}
         />
       </div>
-      <Dialog open={onayBoxInf.isOpen} onClose={handleDialogClose}>
-        <DialogTitle>Silme Onayı</DialogTitle>
-        <DialogContent>
-          <DialogContentText>{onayBoxInf.content}</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
-            İptal
-          </Button>
-          <Button
-            onClick={() => {
-              const { isletmeId } = onayBoxInf.functionData;
-              if (isletmeId) {
-                onayBoxInf.onClickHandler({ isletmeId });
-              }
-            }}
-            color="error"
-          >
-            Sil
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   );
 };

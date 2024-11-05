@@ -1,7 +1,12 @@
 "use server";
 import dbConnect from "@/lib/db/dbConnect";
 import IsletmeModel from "@/lib/models/IsletmeModel";
-import { Parameter, Isletme } from "@/lib/types/types";
+import {
+  DisplayIsletmes,
+  DisplayOdemes,
+  DisplayProjects,
+  Parameter,
+} from "@/lib/types/types";
 import {
   DestekModel,
   ProgramModel,
@@ -42,7 +47,9 @@ export const fetchIsletme = async (queryText: string, queryType: string) => {
   }
 };
 
-export const fetchProjeler = async (durum: string): Promise<any[]> => {
+export const fetchProjeler = async (
+  durum: string
+): Promise<DisplayProjects[]> => {
   if (!durum) {
     throw new Error("Durum parametresi gerekli.");
   }
@@ -56,10 +63,10 @@ export const fetchProjeler = async (durum: string): Promise<any[]> => {
         $project: {
           _id: 0,
           unvan: "$unvan",
-          isletmeId: "$id",
+          isletmeId: "$_id",
           vergiNo: "$vergiNo",
           program: "$projeler.program",
-          id: "$projeler.id",
+          id: "$projeler._id",
           baslamaTarihi: {
             $dateFromString: { dateString: "$projeler.baslamaTarihi" },
           },
@@ -91,15 +98,19 @@ export const fetchProjeler = async (durum: string): Promise<any[]> => {
       },
       { $sort: { gecenGunsayisi: 1 } },
     ]);
-
-    return projeler;
+    const filteredAllItems: DisplayProjects[] = JSON.parse(
+      JSON.stringify(projeler)
+    );
+    return filteredAllItems;
   } catch (error) {
     console.error("Proje alırken hata oluştu: ", error);
     throw new Error("Proje alırken hata oluştu");
   }
 };
 
-export const fetchOdemeler = async (durum: string): Promise<any[]> => {
+export const fetchOdemeler = async (
+  durum: string
+): Promise<DisplayOdemes[]> => {
   if (!durum) {
     throw new Error("Durum parametresi gerekli.");
   }
@@ -120,10 +131,10 @@ export const fetchOdemeler = async (durum: string): Promise<any[]> => {
           },
         },
       },
+      { $unwind: "$odeme" },
       {
-        $unwind: {
-          path: "$odeme",
-          preserveNullAndEmptyArrays: true,
+        $match: {
+          "odeme.durum": durum,
         },
       },
       {
@@ -131,9 +142,9 @@ export const fetchOdemeler = async (durum: string): Promise<any[]> => {
           _id: 0,
           unvan: "$unvan",
           vergiNo: "$vergiNo",
-          projeId: "$projeler.id",
-          isletmeId: "$id",
-          id: "$odeme.id",
+          projeId: "$projeler._id",
+          isletmeId: "$_id",
+          id: "$odeme._id",
           program: "$projeler.program",
           baslamaTarihi: {
             $dateFromString: { dateString: "$projeler.baslamaTarihi" },
@@ -151,17 +162,19 @@ export const fetchOdemeler = async (durum: string): Promise<any[]> => {
           },
         },
       },
-      { $sort: { gecenGunsayisi: -1 } },
+      { $sort: { tarih: -1 } },
     ]);
-
-    return allOdemes;
+    const filteredAllItems: DisplayOdemes[] = JSON.parse(
+      JSON.stringify(allOdemes)
+    );
+    return filteredAllItems;
   } catch (error) {
     console.error("Ödeme alma hatası:", error);
     throw new Error("Ödemeleri alırken hata oluştu. Lütfen tekrar deneyin.");
   }
 };
 
-export const fetchIsletmeler = async (): Promise<any[]> => {
+export const fetchIsletmeler = async (): Promise<DisplayIsletmes[]> => {
   try {
     await dbConnect();
 
@@ -169,7 +182,7 @@ export const fetchIsletmeler = async (): Promise<any[]> => {
       {
         $project: {
           _id: 0,
-          id: "$id",
+          id: "$_id",
           unvan: "$unvan",
           vergiNo: "$vergiNo",
           naceKodu: "$naceKodu",
@@ -181,7 +194,10 @@ export const fetchIsletmeler = async (): Promise<any[]> => {
         },
       },
     ]);
-    return allIsletmes;
+    const filteredAllItems: DisplayIsletmes[] = JSON.parse(
+      JSON.stringify(allIsletmes)
+    );
+    return filteredAllItems;
   } catch (error) {
     console.error("Error fetching businesses:", error);
     throw new Error("İşletmeler alınırken hata oluştu. Lütfen tekrar deneyin.");
@@ -205,7 +221,15 @@ export const fetchPrograms = async (): Promise<Parameter[]> => {
 };
 
 export const fetchDesteks = async (): Promise<Parameter[]> => {
-  return fetchFromModel(DestekModel);
+  try {
+    await dbConnect();
+    const allItems = await DestekModel.find({}).lean();
+    const filteredAllItems: Parameter[] = JSON.parse(JSON.stringify(allItems));
+    return filteredAllItems as Parameter[];
+  } catch (error) {
+    console.error(`Error fetching from model`, error);
+    return [];
+  }
 };
 
 export const fetchSectors = async (): Promise<Parameter[]> => {

@@ -1,21 +1,42 @@
-import AltanSelect from "@/components/Ui/AltanSelect";
+"use client";
 import OdmDataTable from "./OdmDataTable";
-import { useState } from "react";
+import AltanSelect from "@/components/Ui/AltanSelect";
 import { DataTableWrapper } from "@/components/Layouts/Wrappers";
+import { useEffect, useState } from "react";
 import { Typography, Paper, Stack } from "@mui/material";
-import { Odeme } from "@/lib/types/types";
+import { DisplayOdemes } from "@/lib/types/types";
+import { fetchOdemeler } from "@/app/actions/fetchData";
+import { Loader } from "@/components/Ui/Loader";
 
-export const odemeDurumsData = [
+interface OdemeDurum {
+  value: string;
+  label: string;
+}
+
+export const odemeDurumsData: OdemeDurum[] = [
   { value: "ÖDENDİ", label: "Ödendi" },
   { value: "BEKLEMEDE", label: "Beklemede" },
 ];
 
-interface OdmTableContainerProps {
-  odemeler: Odeme[];
-}
+const OdmTableContainer: React.FC = () => {
+  const [odemeDurum, setOdemeDurum] = useState<string>("BEKLEMEDE");
+  const [odemeler, setOdemeler] = useState<DisplayOdemes[]>([]);
 
-const OdmTableContainer: React.FC<OdmTableContainerProps> = ({ odemeler }) => {
-  const [odemeDurum, setOdemeDurum] = useState("BEKLEMEDE");
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchOdemeler(odemeDurum);
+        setOdemeler(response);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+    const timeoutId = setTimeout(fetchData, 200);
+
+    return () => clearTimeout(timeoutId);
+  }, [odemeDurum]);
+
+  console.log(odemeler)
 
   return (
     <Paper>
@@ -38,9 +59,13 @@ const OdmTableContainer: React.FC<OdmTableContainerProps> = ({ odemeler }) => {
           dataValueAttr="value"
         />
       </Stack>
-      <DataTableWrapper tableHeight={"78vh"} sx={{ p: { xs: 1, md: 2 } }}>
-        <OdmDataTable odemeDurum={odemeDurum} odemeler={odemeler} />
-      </DataTableWrapper>
+      {!odemeler || odemeler?.length < 1 ? (
+        <Loader />
+      ) : (
+        <DataTableWrapper tableHeight={"78vh"} sx={{ p: { xs: 1, md: 2 } }}>
+          <OdmDataTable odemeler={odemeler} />
+        </DataTableWrapper>
+      )}
     </Paper>
   );
 };

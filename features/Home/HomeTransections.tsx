@@ -8,7 +8,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { addOdeme, addProje } from "@/app/actions/insertData";
 import { updateIsletme } from "@/app/actions/updateData";
-import { Isletme } from "@/lib/types/types";
+import { Isletme, ProjeWithoutId } from "@/lib/types/types";
 import { handleResponseMsg } from "@/utils/toast-helper";
 
 interface HomeTransectionsProps {
@@ -26,45 +26,36 @@ const HomeTransections: React.FC<HomeTransectionsProps> = ({
 
   const isletmeUpdatesubmitHandler = async (values: any) => {
     try {
-      const editIsletmeRecord: any = getChangedValues(values, isletme);
+      const { projeler, ...filtIsletme } = isletme;
+      const editIsletmeRecord: any = getChangedValues(values, filtIsletme);
       const res = await updateIsletme(isletme._id, editIsletmeRecord);
       handleResponseMsg(res);
       setSearchData((prevFormData: any) => ({
         ...prevFormData,
-        id: values.isletmeId,
+        firmaId: isletme._id,
       }));
     } catch (error) {
-      toast.error("An error occurred while updating isletme.");
+      toast.error("İşletme güncellenirken bir sorun oluştu");
     } finally {
       setOpenUpdateIsletmeModal(false);
     }
   };
 
-  const projeAddSubmitHandler = async (values: any) => {
+  const projeAddSubmitHandler = async (values: ProjeWithoutId) => {
     try {
-      const projeId = "id" + Math.random().toString(16).slice(2);
       const addProjeRecord = {
-        _id: projeId,
-        id: projeId,
-        isletmeId: isletme.id,
-        baslamaTarihi: values.baslamaTarihi,
-        tamamlanmaTarihi: values.tamamlanmaTarihi,
-        takipTarihi: values.takipTarihi,
-        notlar: values.notlar,
-        sure: values.sure,
-        program: values.program,
-        izleyici: values.izleyici,
+        ...values,
         durum: "Devam Ediyor",
         odemeler: [],
       };
-      const res = await addProje(addProjeRecord);
+      const res = await addProje(isletme._id, addProjeRecord);
       handleResponseMsg(res);
       setSearchData((prevFormData: any) => ({
         ...prevFormData,
-        id: values.isletmeId,
+        firmaId: isletme._id,
       }));
     } catch (error) {
-      toast.error("An error occurred while adding the project.");
+      toast.error("Proje Eklenirken Bir Hata Oluştu");
     } finally {
       setOpenAddProjeModal(false);
     }
@@ -72,26 +63,21 @@ const HomeTransections: React.FC<HomeTransectionsProps> = ({
 
   const odemeAddSubmitHandler = async (values: any) => {
     try {
-      const odemeId = "id" + Math.random().toString(16).slice(2);
       const addOdemeRecord = {
-        _id: odemeId,
-        isletmeId: isletme.id,
-        id: odemeId,
-        projeId: values.projeId,
+        destek: values.destek,
         karekod: values.karekod,
         tarih: values.tarih,
         tutar: values.tutar,
-        destek: values.destek,
         durum: "BEKLEMEDE",
       };
-      const res = await addOdeme(addOdemeRecord);
+      const res = await addOdeme(isletme._id, values.projeId, addOdemeRecord);
       handleResponseMsg(res);
       setSearchData((prevFormData: any) => ({
         ...prevFormData,
-        id: values.isletmeId,
+        firmaId: isletme._id,
       }));
     } catch (error) {
-      toast.error("An error occurred while adding the payment.");
+      toast.error("Proje Eklenirken Bir Hata Oluştu");
     } finally {
       setOpenAddOdemeModal(false);
     }
@@ -115,6 +101,7 @@ const HomeTransections: React.FC<HomeTransectionsProps> = ({
           size="medium"
           maxh="4vh"
           endIconLogo="editnote"
+          minHeight={{ md: "30vh", xs: "30vh", lg: "30vh" }}
         >
           <IsletmeForm
             submitHandler={isletmeUpdatesubmitHandler}
@@ -133,17 +120,20 @@ const HomeTransections: React.FC<HomeTransectionsProps> = ({
           minW="33%"
           maxh="4vh"
           endIconLogo="project"
+          minHeight={{ md: "30vh", xs: "30vh", lg: "30vh" }}
         >
           <ProjeForm
             submitHandler={projeAddSubmitHandler}
             initialData={{
-              program: "",
               baslamaTarihi: todayDateInput,
-              tamamlanmaTarihi: todayDateInput,
-              takipTarihi: todayDateInput,
-              sure: "",
-              notlar: "",
+              durum: "",
               izleyici: "",
+              notlar: "",
+              program: "",
+              sure: "",
+              takipTarihi: todayDateInput,
+              tamamlanmaTarihi: todayDateInput,
+              odemeler: [],
             }}
           />
         </ModalButton>
@@ -158,16 +148,17 @@ const HomeTransections: React.FC<HomeTransectionsProps> = ({
           setModalOpen={setOpenAddOdemeModal}
           size="medium"
           endIconLogo="payment"
+          minHeight={{ md: "30vh", xs: "30vh", lg: "30vh" }}
         >
           <OdemeForm
             submitHandler={odemeAddSubmitHandler}
             isletme={isletme}
             initialData={{
-              projeId: "",
               karekod: "",
               destek: "",
               tarih: todayDateInput,
               tutar: 0,
+              durum: "BEKLEMEDE",
             }}
           />
         </ModalButton>

@@ -1,8 +1,10 @@
 "use client";
 import MenuIcon from "@mui/icons-material/Menu";
 import ArchitectureIcon from "@mui/icons-material/Architecture";
+import profileImg from "../../lib/assets/img/profile.jpg";
 import { useState, MouseEvent } from "react";
 import { useRouter } from "next/navigation";
+
 import {
   Menu,
   AppBar,
@@ -17,6 +19,7 @@ import {
 } from "@mui/material";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface Page {
   title: string;
@@ -169,7 +172,23 @@ const NavBar: React.FC = () => {
 
           <Box sx={{ flexGrow: 0 }}>
             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-              <Avatar alt="Mehmet Altan" />
+              <Box
+                sx={{
+                  position: "relative",
+                  width: "100%",
+                  textAlign: "center",
+                  borderRadius: "100%",
+                  overflow: "hidden",
+                }}
+              >
+                <Image
+                  src={profileImg}
+                  height={"50"}
+                  width={"50"}
+                  alt="profilepic"
+                  objectFit="cover"
+                />
+              </Box>
             </IconButton>
 
             <Menu
@@ -189,10 +208,13 @@ const NavBar: React.FC = () => {
               onClose={handleCloseUserMenu}
             >
               <MenuItem onClick={() => router.push("/parametreler")}>
-                <Link
-                  href={"/register"}
-                  style={{ textDecoration: "none", color: "black" }}
-                >
+                <Link href={"/parametreler"} style={{ textDecoration: "none" }}>
+                  <Typography textAlign="center">Parametreler</Typography>
+                </Link>
+              </MenuItem>
+
+              <MenuItem onClick={() => router.push("/register")}>
+                <Link href={"/register"} style={{ textDecoration: "none" }}>
                   <Typography textAlign="center">Yeni Kullanıcı</Typography>
                 </Link>
               </MenuItem>

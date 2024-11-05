@@ -39,6 +39,7 @@ const IsletmeForm: React.FC<IsletmeFormProps> = ({
     sistemId: Yup.string().required("Boş Olamaz"),
     vergiNo: Yup.string().required("Boş Olamaz").min(10, "En az 10 karakter"),
     naceKodu: Yup.string().required("Boş Olamaz"),
+    yetkili: Yup.string().required("Boş Olamaz"),
     adres: Yup.string().required("Boş Olamaz"),
     mail: Yup.string().email("Geçersiz e-posta").required("Boş Olamaz"),
   });
@@ -48,7 +49,6 @@ const IsletmeForm: React.FC<IsletmeFormProps> = ({
       initialValues={initialData}
       onSubmit={submitHandler}
       validationSchema={validateSchema}
-      validateOnChange={false}
     >
       {({ values }) => (
         <Form>
