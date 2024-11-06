@@ -1,4 +1,3 @@
-import { memo } from "react";
 import {
   Button,
   Dialog,
@@ -55,4 +54,4 @@ const OnayBox = ({ onayBoxInf, setOnayBoxInf }: OnayBoxProps) => {
   );
 };
 
-export default memo(OnayBox);
+export default OnayBox;
