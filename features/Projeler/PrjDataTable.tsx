@@ -1,6 +1,6 @@
 import DataTableFrame from "@/components/Tables/DataTableFrame";
 import DeleteIcon from "@mui/icons-material/Delete";
-import OnayBox from "@/components/Ui/OnayBox";
+import ConfirmBox from "@/components/Forms/ConfirmBox";
 import { dateFormatNormal } from "@/utils/helpers";
 import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
@@ -14,6 +14,8 @@ import {
   actionColumn,
   dateColumn,
 } from "@/components/Tables/columns";
+
+
 
 interface OnayBoxInf {
   isOpen: boolean;
@@ -202,7 +204,7 @@ const PrjDataTable: React.FC<PrjDataTableProps> = ({ projeler }) => {
   return (
     <div style={{ height: "100%", width: "100%" }}>
       {onayBoxInf.isOpen && (
-        <OnayBox onayBoxInf={onayBoxInf} setOnayBoxInf={setOnayBoxInf} />
+        <ConfirmBox onayBoxInf={onayBoxInf} setOnayBoxInf={setOnayBoxInf} />
       )}
       <DataTableFrame
         getRowHeight={() => "auto"}

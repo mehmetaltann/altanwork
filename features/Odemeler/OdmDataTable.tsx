@@ -1,6 +1,6 @@
 import DataTableFrame from "@/components/Tables/DataTableFrame";
 import DeleteIcon from "@mui/icons-material/Delete";
-import OnayBox from "@/components/Ui/OnayBox";
+import ConfirmBox from "@/components/Forms/ConfirmBox";
 import { toast } from "react-toastify";
 import { GridRenderCellParams } from "@mui/x-data-grid";
 import { useCallback, useState } from "react";
@@ -163,7 +163,7 @@ const OdmDataTable: React.FC<OdmDataTableProps> = ({ odemeler }) => {
     <>
       <div style={{ height: "100%", width: "100%" }}>
         {onayBoxInf.isOpen && (
-          <OnayBox onayBoxInf={onayBoxInf} setOnayBoxInf={setOnayBoxInf} />
+          <ConfirmBox onayBoxInf={onayBoxInf} setOnayBoxInf={setOnayBoxInf} />
         )}
         <DataTableFrame
           getRowHeight={() => "auto"}

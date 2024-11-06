@@ -1,6 +1,6 @@
 import DataTableFrame from "../../components/Tables/DataTableFrame";
 import DeleteIcon from "@mui/icons-material/Delete";
-import OnayBox from "@/components/Ui/OnayBox";
+import ConfirmBox from "@/components/Forms/ConfirmBox";
 import { GridRenderCellParams } from "@mui/x-data-grid";
 import { toast } from "react-toastify";
 import { IconButton } from "@mui/material";
@@ -78,7 +78,7 @@ const IslDataTable = ({ isletmeler }: { isletmeler: DisplayIsletmes[] }) => {
   return (
     <>
       {onayBoxInf.isOpen && (
-        <OnayBox onayBoxInf={onayBoxInf} setOnayBoxInf={setOnayBoxInf} />
+        <ConfirmBox onayBoxInf={onayBoxInf} setOnayBoxInf={setOnayBoxInf} />
       )}
       <div style={{ height: "100%", width: "100%" }}>
         <DataTableFrame

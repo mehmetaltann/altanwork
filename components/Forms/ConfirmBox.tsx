@@ -16,7 +16,7 @@ interface OnayBoxProps {
   setOnayBoxInf: React.Dispatch<React.SetStateAction<any>>;
 }
 
-const OnayBox = ({ onayBoxInf, setOnayBoxInf }: OnayBoxProps) => {
+const ConfirmBox = ({ onayBoxInf, setOnayBoxInf }: OnayBoxProps) => {
   const { isOpen, content, onClickHandler, functionData } = onayBoxInf;
   const handleDialogClose = () => {
     setOnayBoxInf((prevFormData: any) => ({
@@ -54,4 +54,4 @@ const OnayBox = ({ onayBoxInf, setOnayBoxInf }: OnayBoxProps) => {
   );
 };
 
-export default OnayBox;
+export default ConfirmBox;

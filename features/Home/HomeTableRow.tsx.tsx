@@ -5,7 +5,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ProjeForm from "@/components/Forms/ProjeForm";
 import OdemeForm from "@/components/Forms/OdemeForm";
 import ModalIconButton from "@/components/modals/ModalIconButton";
-import OnayBox from "@/components/Ui/OnayBox";
+import ConfirmBox from "@/components/Forms/ConfirmBox";
 import { toast } from "react-toastify";
 import { getChangedValues, dateFormat } from "@/utils/helpers";
 import { Fragment, useState } from "react";
@@ -189,7 +189,7 @@ const HomeTableRow = ({
   return (
     <Fragment>
       {onayBoxInf.isOpen && (
-        <OnayBox onayBoxInf={onayBoxInf} setOnayBoxInf={setOnayBoxInf} />
+        <ConfirmBox onayBoxInf={onayBoxInf} setOnayBoxInf={setOnayBoxInf} />
       )}
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
         <TableCell align="left" width="1%">

@@ -3,7 +3,7 @@ import Grid from "@mui/material/Grid2";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ModalButton from "@/components/modals/ModalButton";
 import IsletmeForm from "@/components/Forms/IsletmeForm";
-import OnayBox from "@/components/Ui/OnayBox";
+import ConfirmBox from "@/components/Forms/ConfirmBox";
 import { toast } from "react-toastify";
 import { useState, ChangeEvent } from "react";
 import { addIsletme } from "@/app/actions/insertData";
@@ -121,7 +121,7 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
   return (
     <Card>
       {onayBoxInf.isOpen && (
-        <OnayBox onayBoxInf={onayBoxInf} setOnayBoxInf={setOnayBoxInf} />
+        <ConfirmBox onayBoxInf={onayBoxInf} setOnayBoxInf={setOnayBoxInf} />
       )}
       <Stack
         sx={{ p: 1 }}
