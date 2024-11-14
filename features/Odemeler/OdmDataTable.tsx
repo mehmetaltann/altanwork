@@ -66,7 +66,7 @@ const OdmDataTable: React.FC<OdmDataTableProps> = ({ odemeler }) => {
         durum: newRow.durum,
       };
       try {
-        const res = await updateOdeme(newRecord);
+        const res = await updateOdeme(newRow.isletmeId, newRecord);
         handleResponseMsg(res);
         const res2 = await mutateRow(newRow);
         return res2;

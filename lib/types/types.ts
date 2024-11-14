@@ -74,8 +74,8 @@ export type DisplayIsletmes = {
   naceKodu?: string;
   mail: string;
   numberOfOdeme: number;
+  isletmeId: string;
 };
-
 
 export type DisplayProjects = {
   id: string;

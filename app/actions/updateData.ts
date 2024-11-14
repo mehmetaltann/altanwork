@@ -49,6 +49,8 @@ export const updateProje = async (
   const newData = Object.fromEntries(
     Object.entries(formData).map(([k, v]) => [`projeler.$.${k}`, v])
   );
+  console.log(isletmeId);
+  console.log(projeId);
   try {
     await dbConnect();
     const updatedIsletme = await IsletmeModel.updateOne(
@@ -71,7 +73,10 @@ export const updateProje = async (
   }
 };
 
-export const updateOdeme = async (formData: any): Promise<UpdateResponse> => {
+export const updateOdeme = async (
+  isletmeId: string,
+  formData: any
+): Promise<UpdateResponse> => {
   if (!formData) {
     return {
       msg: "Güncellenmiş Ödeme Dosyası Server'a Gelmedi",
@@ -88,6 +93,7 @@ export const updateOdeme = async (formData: any): Promise<UpdateResponse> => {
     await dbConnect();
     const updatedIsletme = await IsletmeModel.updateOne(
       {
+        _id: isletmeId,
         "projeler.odemeler._id": formData._id,
       },
       {
