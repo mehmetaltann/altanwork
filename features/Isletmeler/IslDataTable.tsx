@@ -17,7 +17,13 @@ interface OnayBoxInf {
   functionData: { [key: string]: any };
 }
 
-const IslDataTable = ({ isletmeler }: { isletmeler: DisplayIsletmes[] }) => {
+const IslDataTable = ({
+  isletmeler,
+  setUpdate,
+}: {
+  isletmeler: DisplayIsletmes[];
+  setUpdate: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   const [onayBoxInf, setOnayBoxInf] = useState<OnayBoxInf>({
     isOpen: false,
     content: "",
@@ -33,6 +39,7 @@ const IslDataTable = ({ isletmeler }: { isletmeler: DisplayIsletmes[] }) => {
         ...prev,
         isOpen: false,
       }));
+      setUpdate(true);
     } catch (error) {
       toast.error("İşletme Silinemedi, bir hata oluştu");
     }

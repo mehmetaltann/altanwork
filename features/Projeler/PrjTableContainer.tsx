@@ -25,6 +25,7 @@ export const projeDurumsData: ProjeDurum[] = [
 const PrjTableContainer: React.FC = () => {
   const [projeDurum, setProjeDurum] = useState<string>("Devam Ediyor");
   const [projeler, setProjeler] = useState<DisplayProjects[]>([]);
+  const [update, setUpdate] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,10 +36,9 @@ const PrjTableContainer: React.FC = () => {
         console.error("Error fetching projects:", error);
       }
     };
-    const timeoutId = setTimeout(fetchData, 200);
-
-    return () => clearTimeout(timeoutId);
-  }, [projeDurum]);
+    fetchData();
+    setUpdate(false);
+  }, [projeDurum, update]);
 
   return (
     <Paper>
@@ -66,7 +66,7 @@ const PrjTableContainer: React.FC = () => {
         <Loader />
       ) : (
         <DataTableWrapper tableHeight={"78vh"} sx={{ p: { xs: 1, md: 2 } }}>
-          <PrjDataTable projeDurum={projeDurum} projeler={projeler} />
+          <PrjDataTable setUpdate={setUpdate} projeler={projeler} />
         </DataTableWrapper>
       )}
     </Paper>

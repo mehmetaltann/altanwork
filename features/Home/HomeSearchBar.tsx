@@ -61,8 +61,9 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
   const handleInputsChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setSearchData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value.toLocaleUpperCase("tr-TR"),
+      unvan: name === "unvan" ? value.toLocaleUpperCase("tr-TR") : "",
+      vergiNo: name === "vergiNo" ? value : "",
+      firmaId: name === "firmaId" ? value : "",
     }));
   };
 
@@ -136,7 +137,7 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
           alignItems={"center"}
           justifyContent={"flex-start"}
         >
-          <Grid sx={{ xs: { pr: 1 }, md: { pr: 4 } }}>
+          <Grid sx={{ xs: { pr: 1 }, md: { pr: 4 } }} >
             <Stack
               direction="row"
               alignItems={"center"}
@@ -149,12 +150,9 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
             </Stack>
           </Grid>
 
-          <Grid container justifyContent={"center"} alignItems={"center"}>
+          <Grid container justifyContent={{lg:"center"}} alignItems={"center"}>
             <Grid>
               <TextField
-                disabled={
-                  searchData.firmaId !== "" || searchData.vergiNo !== ""
-                }
                 label="Unvan"
                 name="unvan"
                 variant="outlined"
@@ -164,7 +162,6 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
             </Grid>
             <Grid>
               <TextField
-                disabled={searchData.firmaId !== "" || searchData.unvan !== ""}
                 label="Vergi Numarası"
                 variant="outlined"
                 name="vergiNo"
@@ -175,7 +172,6 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
             </Grid>
             <Grid>
               <TextField
-                disabled={searchData.vergiNo !== "" || searchData.unvan !== ""}
                 label="Id"
                 name="firmaId"
                 variant="outlined"
@@ -216,6 +212,7 @@ const HomeSearchBar: React.FC<HomeSearchBarProps> = ({
             size="large"
             endIconLogo="addnew"
             minHeight={{ md: "50vh", xs: "50vh", lg: "30vh" }}
+            minW = {{ md: "120%", xs: "100%" }}
           >
             <IsletmeForm
               submitHandler={isletmeAddSubmitHandler}

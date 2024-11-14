@@ -26,6 +26,7 @@ interface OnayBoxInf {
 
 interface OdmDataTableProps {
   odemeler: DisplayOdemes[];
+  setUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const useFakeMutation = () => {
@@ -46,7 +47,7 @@ const useFakeMutation = () => {
   );
 };
 
-const OdmDataTable: React.FC<OdmDataTableProps> = ({ odemeler }) => {
+const OdmDataTable: React.FC<OdmDataTableProps> = ({ odemeler, setUpdate }) => {
   const [onayBoxInf, setOnayBoxInf] = useState<OnayBoxInf>({
     isOpen: false,
     content: "",
@@ -69,6 +70,7 @@ const OdmDataTable: React.FC<OdmDataTableProps> = ({ odemeler }) => {
         const res = await updateOdeme(newRow.isletmeId, newRecord);
         handleResponseMsg(res);
         const res2 = await mutateRow(newRow);
+        setUpdate(true);
         return res2;
       } catch (error) {
         toast.error("Güncelleme sırasında hata oluştu.");
@@ -91,6 +93,7 @@ const OdmDataTable: React.FC<OdmDataTableProps> = ({ odemeler }) => {
       const response = await deleteOdeme(isletmeId, projeId, odemeId);
       handleResponseMsg(response);
       setOnayBoxInf((prev) => ({ ...prev, isOpen: false }));
+      setUpdate(true);
     } catch (error) {
       toast.error(`Ödeme Silinemedi, Bir hata oluştu : ${error}`);
     }

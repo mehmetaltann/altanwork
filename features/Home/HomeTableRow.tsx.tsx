@@ -139,7 +139,7 @@ const HomeTableRow = ({
       durum: values.durum,
     };
     try {
-      const res = await updateOdeme(editOdemeRecord);
+      const res = await updateOdeme(isletme._id, editOdemeRecord);
       handleResponseMsg(res);
       setSearchData((prev: any) => ({
         ...prev,
@@ -238,7 +238,7 @@ const HomeTableRow = ({
           {odemeler?.length === 0 && (
             <IconButton
               size="small"
-              color="primary"
+              color="error"
               onClick={() => {
                 const isletmeId = isletme._id;
                 setOnayBoxInf({
@@ -315,7 +315,7 @@ const HomeTableRow = ({
                         <TableCell width="10%">
                           <IconButton
                             size="small"
-                            color="primary"
+                            color="error"
                             onClick={() => {
                               const isletmeId = isletme._id;
                               setOnayBoxInf({

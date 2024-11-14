@@ -49,8 +49,6 @@ export const updateProje = async (
   const newData = Object.fromEntries(
     Object.entries(formData).map(([k, v]) => [`projeler.$.${k}`, v])
   );
-  console.log(isletmeId);
-  console.log(projeId);
   try {
     await dbConnect();
     const updatedIsletme = await IsletmeModel.updateOne(

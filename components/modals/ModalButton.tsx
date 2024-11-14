@@ -16,8 +16,8 @@ const iconMap = {
 
 interface ModalButtonProps {
   children: React.ReactNode;
-  minW?: string;
-  maxW?: string;
+  minW?: { md: string; xs: string };
+  maxW?: { md: string; xs: string };
   maxh?: string;
   title: string;
   height?: { md: string; xs: string };
@@ -41,8 +41,8 @@ interface ModalButtonProps {
 
 const ModalButton: React.FC<ModalButtonProps> = ({
   children,
-  minW = "25vh",
-  maxW = "35vh",
+  minW = { md: "33%", xs: "100%" },
+  maxW = { md: "33%", xs: "100%" },
   maxh = "7vh",
   title,
   minHeight = { md: "40vh", xs: "40vh", lg: "40vh" },

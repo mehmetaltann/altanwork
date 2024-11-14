@@ -21,9 +21,11 @@ export const odemeDurumsData: OdemeDurum[] = [
 const OdmTableContainer: React.FC = () => {
   const [odemeDurum, setOdemeDurum] = useState<string>("BEKLEMEDE");
   const [odemeler, setOdemeler] = useState<DisplayOdemes[]>([]);
+  const [update, setUpdate] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setUpdate(true);
       try {
         const response = await fetchOdemeler(odemeDurum);
         setOdemeler(response);
@@ -31,12 +33,11 @@ const OdmTableContainer: React.FC = () => {
         console.error("Error fetching projects:", error);
       }
     };
-    const timeoutId = setTimeout(fetchData, 200);
+    fetchData();
+    setUpdate(false);
+  }, [odemeDurum, update]);
 
-    return () => clearTimeout(timeoutId);
-  }, [odemeDurum]);
-
-  console.log(odemeler)
+  console.log(odemeler);
 
   return (
     <Paper>
@@ -63,7 +64,7 @@ const OdmTableContainer: React.FC = () => {
         <Loader />
       ) : (
         <DataTableWrapper tableHeight={"78vh"} sx={{ p: { xs: 1, md: 2 } }}>
-          <OdmDataTable odemeler={odemeler} />
+          <OdmDataTable odemeler={odemeler} setUpdate={setUpdate} />
         </DataTableWrapper>
       )}
     </Paper>

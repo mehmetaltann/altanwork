@@ -9,6 +9,7 @@ import { Loader } from "@/components/Ui/Loader";
 
 const IslTableContainer: React.FC = () => {
   const [isletmeler, setIsletmeler] = useState<DisplayIsletmes[]>([]);
+  const [update, setUpdate] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,10 +20,9 @@ const IslTableContainer: React.FC = () => {
         console.error("Error fetching projects:", error);
       }
     };
-    const timeoutId = setTimeout(fetchData, 200);
-
-    return () => clearTimeout(timeoutId);
-  }, []);
+    fetchData();
+    setUpdate(false);
+  }, [update]);
 
   return (
     <Paper>
@@ -40,7 +40,7 @@ const IslTableContainer: React.FC = () => {
         <Loader />
       ) : (
         <DataTableWrapper tableHeight={"78vh"} sx={{ p: { xs: 1, md: 2 } }}>
-          <IslDataTable isletmeler={isletmeler} />
+          <IslDataTable setUpdate={setUpdate} isletmeler={isletmeler} />
         </DataTableWrapper>
       )}
     </Paper>

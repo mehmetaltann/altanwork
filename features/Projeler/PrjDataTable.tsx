@@ -15,8 +15,6 @@ import {
   dateColumn,
 } from "@/components/Tables/columns";
 
-
-
 interface OnayBoxInf {
   isOpen: boolean;
   content: string;
@@ -25,8 +23,8 @@ interface OnayBoxInf {
 }
 
 interface PrjDataTableProps {
-  projeDurum: string;
   projeler: DisplayProjects[];
+  setUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const useFakeMutation = () => {
@@ -47,7 +45,7 @@ const useFakeMutation = () => {
   );
 };
 
-const PrjDataTable: React.FC<PrjDataTableProps> = ({ projeler }) => {
+const PrjDataTable: React.FC<PrjDataTableProps> = ({ projeler, setUpdate }) => {
   const [onayBoxInf, setOnayBoxInf] = useState<OnayBoxInf>({
     isOpen: false,
     content: "",
@@ -71,6 +69,7 @@ const PrjDataTable: React.FC<PrjDataTableProps> = ({ projeler }) => {
         const res = await updateProje(newRow.isletmeId, newRow.id, newRecord);
         handleResponseMsg(res);
         const res2 = await mutateRow(newRow);
+        setUpdate(true);
         return res2;
       } catch (error) {
         toast.error("Güncelleme sırasında hata oluştu.");
@@ -91,6 +90,7 @@ const PrjDataTable: React.FC<PrjDataTableProps> = ({ projeler }) => {
       const res = await deleteProje(isletmeId, projeId);
       handleResponseMsg(res);
       setOnayBoxInf((prev) => ({ ...prev, isOpen: false }));
+      setUpdate(true);
     } catch (error) {
       toast.error(`Proje Silinemedi, Bir hata oluştu : ${error}`);
     }
